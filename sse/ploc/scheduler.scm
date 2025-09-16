@@ -1,0 +1,13 @@
+(library (sse ploc scheduler)
+  (export make-scheduler)
+  (import (rnrs base)
+          (only (rnrs r5rs) modulo)
+          (sse utils))
+
+  (define (make-scheduler n)
+      (assert (integer? (lg n)))
+      (let ((counter 0) (prefixes (iota n)))
+        (λ ()
+          (set! counter (+ counter 1))
+          (map (λ (pfx) (+ pfx (* counter n)))
+               prefixes)))))
