@@ -35,7 +35,7 @@
                      AE-init AE-keygen AE-encrypt AE-decrypt
                      memory-setup memory-read memory-write)
 
-    (define max-depth (+ (lg N) 1))
+    (define max-depth (lg N))
 
     (define (make-address node-id depth) (G node-id depth))
 

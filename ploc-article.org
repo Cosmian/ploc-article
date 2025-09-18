@@ -394,15 +394,15 @@ table [[table:notations]].
 * Description
 ** $\ploc$
 
-The complete algorithm is given in  appendix [[The $\ploc$ scheme]].  We have chosen
-to implement  it in the Scheme  programming language [cite:@10.5555/1618542] for
-its   well-defined   semantics    and   conciseness[fn::The   entire   reference
-implementation  given in  appendix [[*Reference  implementation]] is  less than  400
-lines  long.],  which  incidentally  provides  a  reference  implementation  for
-$\ploc$.   A description  of  the syntax  required to  understand  this code  is
-provided  in appendix [[A  scheme primer]].   The present  section details  the most
-important  aspects of  the  algorithm step  by  step.  It  is  assumed that  the
-following names are in scope:
+The complete  algorithm is given  in appendix [[The $\ploc$ scheme]][fn::It  is also
+available as a [[https://github.com/Cosmian/ploc-article][Github repository]].]. We have chosen to implement it in the Scheme
+programming language [cite:@10.5555/1618542] for  its well-defined semantics and
+conciseness[fn::The entire reference implementation given in appendix [[*Reference
+implementation]]  is less  than 400  lines long.],  which incidentally  provides a
+reference implementation for  $\ploc$.  A description of the  syntax required to
+understand  this code  is provided  in  appendix [[A scheme  primer]].  The  present
+section details the most important aspects of the algorithm step by step.  It is
+assumed that the following names are in scope:
 - ~c~ the capacity of each node (i.e. the maximum number of datums they can
   store);
 - ~n~ the (64-bit) number of branches to compact per insertion;
@@ -2298,7 +2298,7 @@ We give here the complete code that allows to run a $\ploc$ client.
                        AE-init AE-keygen AE-encrypt AE-decrypt
                        memory-setup memory-read memory-write)
 
-      (define max-depth (+ (lg N) 1))
+      (define max-depth (lg N))
 
       <<make-address>>
 
