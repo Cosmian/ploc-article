@@ -1,0 +1,3004 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2025-09-18 Thu 13:03 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>All Paths Lead to the Root</title>
+<meta name="generator" content="Org Mode" />
+<style type="text/css">
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #f2f2f299;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { }
+</style>
+<script>
+  window.MathJax = {
+    tex: {
+      ams: {
+        multlineWidth: '85%'
+      },
+      tags: 'ams',
+      tagSide: 'right',
+      tagIndent: '.8em'
+    },
+    chtml: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    svg: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    output: {
+      font: 'mathjax-modern',
+      displayOverflow: 'overflow'
+    }
+  };
+</script>
+
+<script
+  id="MathJax-script"
+  async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">All Paths Lead to the Root</h1>
+<div class="abstract" id="orgbba7fbf">
+<p>
+In an  attempt to  fix the  defects of  the definition  of forward  security for
+Symmetric     Searchable     Encryption      (SSE)     schemes,     Amjad     et
+al. \autocite{AC:AmjKamMoa23}  proposed  injection  security.   This  new  security
+property is strictly stronger than most security properties known to date, which
+makes it  particularly challenging to  design schemes meeting  its requirements.
+In  this work,  we show  how it  is  possible to  use trees  to decorrelate  the
+modification of an  index from its effects, hence  achieving injection security.
+In addition to  being conceptually simple, our  scheme features non-interactive,
+stateless and  mutation-free search operations that  allow supporting concurrent
+readers easily.   Finally, the  proposed reference implementation  is efficient:
+both  \(\Insert\)  and \(\Search\)  operations  execute  in milliseconds  even  when
+operating on an index with up to a million entries and volumes up to a thousand.
+</p>
+
+</div>
+<div id="outline-container-org33d8429" class="outline-2">
+<h2 id="org33d8429"><span class="section-number-2">1.</span> Introduction</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+Symmetric Searchable Encryption (SSE) is a  formalism used to study the security
+of protocols  manipulating a document index  stored by a distant  server: an SSE
+scheme is a bipartite protocol with one  of the party (the server) usually being
+considered honest-but-curious, and the notion of  leakage is used to capture the
+amount of information  that party can acquire by observing  the execution of SSE
+operations.  There exists  a natural tension between the efficiency  of a scheme
+and its  security.  SSE  schemes resolutely  fall into  the practical  side when
+compared to more  secure schemes like ORAM, but successive  innovations have led
+to  constructions proposing  stronger security  guaranties to  the detriment  of
+performance.  We stress that in many real-world applications, the performance of
+a scheme  is almost  as important  as its security  since poor  performances may
+hinder its  adoption, resulting in  essentially no security.   While server-side
+memory  is  generally  not  an  issue,  client-side  memory  is  a  particularly
+constrained    resource.    However,    apart    from    notable   works    like
+\autocite{NDSS:DCPP20}, most SSE schemes have a  space complexity that is linear in
+the number of indexed labels \(L\).  Another source of inefficiency that runs even
+deeper  into  the  SSE  literature  is the  impossibility  to  securely  perform
+concurrent queries  to the index, which  stems from the presence  of client-side
+mutable state and  the lack of a clear security  model. Some recent developments
+in  \autocite{AC:AgaKamMoa24,EPRINT:BreHeb24}  made a  step  in  the direction  of
+formalizing security in  the presence of concurrent queries, but  to the best of
+our knowledge,  no concurrent SSE  scheme with a  decent security has  ever been
+published.   In  this work,  we  propose  an  SSE scheme  with  non-interactive,
+stateless and mutation-free search operations that make it trivially amenable to
+concurrent  search queries  provided the  server guarantees  basic shared-object
+properties.  We  believe our scheme  opens up a  broad range of  applications in
+which lightweight clients query an index managed by one powerful client.
+</p>
+
+<p>
+On   the   security   front,   forward    security   &#x2013;   formalized   by   Bost
+in \autocite{10.1145/2976749.2978303} as the unlinkability of updates with previous
+operations &#x2013; has been considered  as a state-of-the-art security property, even
+though it does not guarantee that future search queries cannot be linked to past
+updates.  A  persistent adversary thus  eventually learns what  forward security
+attempts to hide.  Injection Security is  a much stronger property &#x2013; defined as
+the unlinkability of  updates with all other past and  future operations &#x2013; that
+has recently  been proposed \autocite{AC:AmjKamMoa23} to remedy  forward security's
+shortcomings. We believe it  to be a real step forward, which  is why we present
+in this work a new injection-secure SSE scheme named \(\ploc\).
+</p>
+</div>
+<div id="outline-container-orgdfa1d20" class="outline-3">
+<h3 id="orgdfa1d20"><span class="section-number-3">1.1.</span> Related works</h3>
+<div class="outline-text-3" id="text-1-1">
+<p>
+The first  and only injection-secure  SSE scheme to  date \autocite{AC:AmjKamMoa23}
+relies  on decorrelating  the server-side  effects  of a  modification from  its
+intent as follows: upon modifying bindings  for a label \(\ell\), the client saves
+this  modification   locally  under   this  label   and  performs   instead  the
+modifications saved  under a different  label \(\ell'\) chosen  independently from
+\(\ell\). In  their scheme the authors  used a round-robin strategy  going through
+all the labels by batch.  This implies that labels are updated server-side every
+\(\frac{|\bbL|}{C}\) modifications,  where \(\bbL\) is  the labeling domain  and \(C\)
+the   batch  size.    Conversely,  the   size  of   the  client-side   state  is
+\(O(\frac{|\bbL|}{C})\) in the worst case. Moreover, in order to achieve injection
+security, the  client must modify  a number of  values that is  independent from
+\(\ell\), which results  in a bandwidth in  \(O(C \times S)\) for  some constant \(S\)
+chosen at setup.  Conscious of this  cost, the authors astutely pad and truncate
+the set of values  indexed under each label to enable users to  choose \(S = (1 -
+\epsilon) \cdot  V\) for  some loss  parameter \(0 <  \epsilon \le  1\) and  \(V\) an
+upper-bound on  the number of  values indexed per  label, also chosen  at setup.
+However, the  loss cannot be  increased past  a certain amount  without severely
+damaging the  search results, and  the bandwidth  cost remains \(O(C  \times V)\).
+The users are therefore caught in an impossible dilemma: they must constrain the
+size of  the labeling domain to  limit both the client-side  stash and insertion
+bandwidth  at the  risk of  speeding-up query-recovery  attacks (since  possible
+labels are fewer, it is easier to  tell them apart), or otherwise choose between
+an acceptable bound on the client-side  storage or the bandwidth. Finally, since
+the very  security of  this scheme  relies on delaying  the modification  of the
+server state,  it seems impossible to  use it as a  basis on which to  develop a
+concurrent SSE scheme  with anything but a very relaxed  concurrency model.  All
+in all, this scheme represents a  break-through in the field, but presents costs
+that may be prohibitively high for many use-cases.
+</p>
+
+<p>
+Even though not achieving injection  security (nor forward security), we quickly
+present  here \(2ch\) \autocite{PoPETS:APPYY23}  since  it is  conceptually close  to
+ours. This scheme is based on a  complete binary tree, in which indexing a value
+under a  label consists in deriving  two candidate branches from  this label and
+its current volume using  a PRF. The client then fetches  those two branches and
+chooses to  place the new value  inside the least filled  one. Search operations
+always fetch \(2V\)  branches which first \(2\nu(\ell)\) correspond  to the branches
+derived to bind  values to this label  so far, where \(\nu(\ell)\)  is the current
+volume  of  the  label  \(\ell\).   Using this  technique  allows  implementing  a
+volume-hiding \autocite{10.1145/3319535.3354213} scheme.  The  authors also managed
+to reduce the  bandwidth from \(O(\log B)\)  to \(O(\log \log B)\) where  \(B\) is the
+maximum number of bindings that can be indexed in the tree by beheading the tree
+to create  a forest  of trees of  depth \(\log \log  B\).  The  subsequent schemes
+proposed in  the same article  build on and attempt  to recover the  forward and
+backward securities \autocite{10.1145/3133956.3133980},  but are  sub-optimal since
+they require search operations to perform more work.
+</p>
+</div>
+</div>
+<div id="outline-container-org9720e15" class="outline-3">
+<h3 id="org9720e15"><span class="section-number-3">1.2.</span> Contributions</h3>
+<div class="outline-text-3" id="text-1-2">
+<p>
+In  this  work, we  propose  a  novel injection-secure  SSE  scheme  based on  a
+different  technique to  decorrelate a  mutation intent  from its  effects. Like
+in \autocite{PoPETS:APPYY23}, we rely on a tree  structure and values are stored in
+some node  alongside the path leading  to the leaf  selected using a PRF  of the
+indexing label and its current volume. However, since all paths lead to the root
+of a tree, the client can fetch truly random branches upon insertion: as long as
+it possible to compact  the resulting subtree enough to make  space at the root,
+the new value can be inserted on its target path.  Upon search, all \(V\) branches
+associated to a label  are read in order to find the  indexed values. Using this
+technique allows us to build a simple SSE scheme with very desirable properties:
+</p>
+<ul class="org-ul">
+<li>insertions are only required to maintain a \(O(L)\) client-side stash, where \(L\)
+is  the  number  of  labels  currently  indexed,  to  store  their  associated
+volumes.  This is  a  significant improvement  over the  \(O(\frac{|\bbL|}{C})\)
+bound  from \autocite{AC:AmjKamMoa23}. Our  scheme  implements insert  operations
+using  a single  round-trip  and \(O(c  n  \left(\lg(\frac{B}{n}) +  2\right))\)
+bandwidth,  where \(n\)  is the  number of  branches fetched  from the  tree for
+compaction, \(c\) the capacity of each node  and \(B\) the total number of indexed
+bindings;</li>
+<li>searches need only know the key and  do not perform any mutation, which allows
+them  to be  trivially  concurrent  and hence  to  implement a  single-writer,
+several-readers system  that only  leaks the search  pattern. Even  though our
+insertions cannot be used by concurrent  clients due to the mutable state that
+is the  label-volume map,  we consider  it a net  improvement over  the scheme
+proposed in the recent article from Agarwal et al. \autocite{AC:AgaKamMoa24} that
+doesn't  even  guarantee  forward  security   in  the  context  of  concurrent
+operations.  Our scheme implements search operations using a single round-trip
+and a \(O(c \cdot V \lg B)\) bandwidth.</li>
+<li>additionally, we  show how to apply  some of the standard  techniques from the
+literature to implement a more  expressive interface, for example that support
+deletions, and to make insertions stateless.</li>
+</ul>
+</div>
+</div>
+</div>
+<div id="outline-container-orga0f59fe" class="outline-2">
+<h2 id="orga0f59fe"><span class="section-number-2">2.</span> Preliminaries</h2>
+<div class="outline-text-2" id="text-2">
+</div>
+<div id="outline-container-orgc6a08d2" class="outline-3">
+<h3 id="orgc6a08d2"><span class="section-number-3">2.1.</span> Structured Encryption</h3>
+<div class="outline-text-3" id="text-2-1">
+<p>
+Structured Encryption (STE) was  first introduced in \autocite{chase2010structured}
+to allow a client  to query a data structure stored by  a server with controlled
+leakages. An  STE scheme  is based  on an  Abstract Data  Type (ADT)  defined as
+follows:
+</p>
+
+<div class="definition" id="org2de64c1">
+<p>
+An  abstract data  type  is defined  as  a  pair \((\bbS,  \bbO)\)  of states  and
+operations on those  states which every realizations of this  abstract data type
+must support.  Without loss of generality,  we constrain operations in \(\bbO\) to
+be parameterized by their  argument and result sets \(\bbA\) and  \(\bbR\) and to be
+of type \(\bbA \times \bbS \rightarrow \bbR \times \bbS\).
+</p>
+
+</div>
+
+<div class="definition" id="orge6680a3">
+<p>
+Given an abstract data type \(\cT = (\bbS, \bbO)\), a \(\cT\) encryption scheme is a
+bipartite protocol involving  a client and a server that  supports the following
+operations:
+</p>
+<ul class="org-ul">
+<li>\((k, \stt; EDS) \gets \Setup(DS; )\) in which the client takes as input a valid
+data structure \(DS  \in \bbS\), and at  the end of which the  client receives a
+key  \(k\) and  a  state \(\stt\),  and  the server  receives  the encrypted  data
+structure \(EDS\) corresponding to \(DS\);</li>
+</ul>
+<p>
+for each operation \(\op \in \bbO\) parameterized by \(\bbA\) and \(\bbR\):
+</p>
+<ul class="org-ul">
+<li>\((\res, \stt'; EDS') \gets \op(k, \args, \stt; EDS)\) in which the client takes
+as input the key \(k\), a state  \(\stt\) and some arguments \(\args \in \bbA\), the
+server takes  as input an  encrypted data  structure \(EDS\) corresponding  to a
+data-structure \(DS \in \bbS\), and at the  end of which the client receives the
+results \(\res  \in \bbR\) and  the server  the encrypted data  structure \(EDS'\)
+corresponding to  the data structure  \(DS' \in  \bbS\), where \(\res\)  and \(DS'\)
+correspond to what locally applying \(\op\) on \(\args\) and \(DS\) would return.</li>
+</ul>
+
+</div>
+
+<div class="remark" id="org7bce7b1">
+<p>
+Even though the  standard definition for a structured  encryption scheme expects
+the setup to  take as argument an initial data  structure, the schemes described
+in this  article do not. However,  it is easy  to see that an  alternative setup
+procedure taking as argument a data structure can be obtained without additional
+leakage by executing a setup followed by one or more update operations.  Indeed,
+\(\ploc\) insert  operation only has trivial  leakages and so does  the tree merge
+operation when taking the entire tree as argument.
+</p>
+
+</div>
+</div>
+</div>
+<div id="outline-container-orgc29765d" class="outline-3">
+<h3 id="orgc29765d"><span class="section-number-3">2.2.</span> Multi-map Encryption Scheme</h3>
+<div class="outline-text-3" id="text-2-2">
+<p>
+One particular instance of structured encryption  has been at the center of most
+of the  works in the literature  for its immediate applicability:  the multi-map
+encryption scheme.
+</p>
+
+<div class="definition" id="orgabb0e87">
+<p>
+A (semi-dynamic)  multi-map is an  abstract data  type parameterized by  a label
+domain \(\bbL\) and a value domain \(\bbV\), which valid states are the functions in
+\(\bbL \rightarrow  \bbV^*\), where \(\bbV^* =  \bot \cup \bbV \times  \bbV^*\), and
+which operations are:
+</p>
+<ul class="org-ul">
+<li>\(((v_i)_i, \MM) \gets \Search(\ell, \MM)\) takes as argument a label \(\ell\) and
+a valid state \(\MM\), and returns the  (possibly empty) list of values bound to
+that label by the given state;</li>
+<li>\((\bot, \MM') \gets  \Insert((\ell, v), \MM)\) takes as argument  a label \(\ell
+  \in \bbL\), a value  \(v \in \bbV\) and a state \(\MM\), and  returns the new state
+\(\MM'\) such  that \(\MM'(\ell') = \MM(\ell')\)  for each label \(\ell'  \ne \ell\)
+and \(\MM'(\ell) = (v, \MM(\ell))\) otherwise.</li>
+</ul>
+<p>
+A multi-map is said to be fully-dynamic if it additionally supports:
+</p>
+<ul class="org-ul">
+<li>\((\bot, \MM') \gets  \Delete((\ell, v), \MM)\) takes as argument  a label \(\ell
+  \in \bbL\), a value  \(v \in \bbV\) and a state \(\MM\), and  returns the new state
+\(\MM'\) such  that \(\MM'(\ell') = \MM(\ell')\)  for each label \(\ell'  \ne \ell\)
+and \(\MM'(\ell) = \MM(\ell) \setminus \ell\) otherwise.</li>
+</ul>
+
+</div>
+
+<div class="definition" id="org1c0d8ed">
+<p>
+A (semi-dynamic) multi-map encryption scheme  is therefore the protocol exposing
+the following operations which semantics is given by the STE definition:
+</p>
+<ul class="org-ul">
+<li>\(((v_i)_i, \stt'; \EMM) \gets \Search(k, \ell, \stt; \EMM)\);</li>
+<li>\((\bot, \stt'; \EMM') \gets \Insert(k, (\ell, v), \stt; \EMM)\).</li>
+</ul>
+<p>
+A multi-map  encryption scheme is  said to  be fully-dynamic if  it additionally
+exposes:
+</p>
+<ul class="org-ul">
+<li>\((\bot, \stt'; \EMM') \gets \Delete(k, (\ell, v), \stt; \EMM)\).</li>
+</ul>
+
+</div>
+</div>
+</div>
+<div id="outline-container-org068725f" class="outline-3">
+<h3 id="org068725f"><span class="section-number-3">2.3.</span> Symmetric Searchable Encryption</h3>
+<div class="outline-text-3" id="text-2-3">
+<p>
+While structured  encryption addresses the  abstract and fundamental  problem of
+securing  data-structures, Symmetric  Searchable Encryption  (SSE) as  described
+in \autocite{10.1145/1180405.1180417} by  Curtmola et al. addresses  the problem of
+securing a specific  use-case in which a  client wishes to retrieve  the list of
+document  IDs of  all documents  matching a  given label,  from a  collection of
+documents   stored  in   a   remote  server.    While   the  interface   defined
+in \autocite{10.1145/1180405.1180417}  differs from  those  of a  multi-map, it  is
+trivial to implement an SSE scheme  from a multi-map encryption scheme. For this
+reason, we claim in this work to  present a new SSE scheme while only presenting
+a new encrypted multi-map implementation.
+</p>
+</div>
+</div>
+<div id="outline-container-org5356349" class="outline-3">
+<h3 id="org5356349"><span class="section-number-3">2.4.</span> Leakages and adaptive security</h3>
+<div class="outline-text-3" id="text-2-4">
+<p>
+The leakage function plays a central role in the SSE literature since it is used
+to quantify the information leaked to  the adversary by each operation.  In this
+work, we consider the notion  of adaptive security against a honest-but-curious,
+polynomial-time server.
+</p>
+
+<div class="definition" id="orgd99694e">
+<p>
+An STE scheme \(\Sigma\) is said to be \(\cL\)-adaptively-secure if there exists a
+simulator \(\phi\)  such that  for any  stateful honest-but-curious  PPT adversary
+\(\cA\)   and   any   auxiliary    information   \(z   \in   \{0,1\}^*\):   \[\left|
+P(\mathbf{Real}_{\Sigma,\cA}(1^\lambda,  z)  =  1)  -  P(\mathbf{Ideal}_{\Sigma,
+\cA}^{\phi, \cL}(1^\lambda, z)  = 1) \right| =  \mathtt{negl}(\lambda), \] where
+the real and ideal games are defined as follows:
+</p>
+<ul class="org-ul">
+<li>the challenger  either executes  the client  code of  the STE  scheme \(\Sigma\)
+(real game)  or the  composition \(\phi  \circ \cL\) of  the simulator  with the
+leakage function  (ideal game), while the  adversary plays the server  code of
+the STE scheme \(\Sigma\).</li>
+<li>the  adversary  adaptively  chooses  a   sequence  of  (polynomially  many  in
+\(\lambda\)) ADT operations that are jointly executed with the challenger.</li>
+<li>the adversary outputs a bit \(b\in \{0,1\}\).</li>
+</ul>
+
+</div>
+</div>
+</div>
+<div id="outline-container-orgfae4cc1" class="outline-3">
+<h3 id="orgfae4cc1"><span class="section-number-3">2.5.</span> Security properties</h3>
+<div class="outline-text-3" id="text-2-5">
+<p>
+If leakage  functions capture the information  that is leaked by  SE operations,
+evaluating  the  level  of  privacy  guaranteed  by  a  given  leakage  or  even
+establishing  an order  relation on  the leakages  that reflects  those security
+guarantees    remains     a    difficult     problem \autocites[]{PoPETS:BosFou19}[][]{10.1145/3548606.3560593}.   It has  thus  become idiomatic  to describe  scheme
+privacy using <i>security properties</i>, which are  associated to the set of attacks
+known to hold against them.
+</p>
+
+<p>
+The most important  source of attacks against SSE schemes  is the search pattern
+&#x2013; sometimes called  query equality &#x2013; which  allows an attacker to  partition a
+sequence of  search queries with respect  to the searched label  (without always
+being able to guess which are those labels).
+</p>
+
+<div class="definition" id="org646962f">
+<p>
+Given a sequence of \(m\) search operations \((o_1, ..., o_m)\), the search pattern,
+noted \(\spattern\), is the matrix \(M \in \{0,1\}^{m \times m}\) such that \(M[i][j]
+= i\)  if and only  if the operations  \(o_i\) and \(o_j\)  both search for  the same
+label.
+</p>
+
+</div>
+
+<div class="remark" id="org1fa8377">
+<p>
+If the  label domain \(\bbL\)  is countable, there  exists a bijection  \(idx\) from
+\([0,|\bbL|[\) to \(\bbL\) and the matrix-based  definition of the search pattern is
+equivalent   to  leaking   \(\pi_{[0,|\bbL|[}  \circ   idx^{-1}  (\ell)\),   where
+\(\pi_{[0,|\bbL|[}\) is a random permutation  on \([0,|\bbL|[\).  This definition is
+easier to use in practice since it is comes up more naturally in the proofs.
+</p>
+
+</div>
+
+<p>
+Injection  security  is  a  property  of  the  leakage  functions  of  multi-map
+encryption  schemes that  has  recently  been defined  in \autocite{AC:AmjKamMoa23}
+guaranteeing that  no link  can ever  be made between  a mutation  (insertion or
+deletion) and any other past or future  operation.  While we refer the reader to
+the original article for its game-based  definition, we give here the sufficient
+condition we use in this article:
+</p>
+
+<div class="theorem" id="org3c0be08">
+<p>
+A leakage  function \(\cL\) is said  to be injection-secure if  \(\cL(\op, \args) =
+(\op, \spattern)\) if \(\op\) is \(\Search\) and \(\op\) otherwise.
+</p>
+
+</div>
+
+<div class="proof" id="org0b5c960">
+<p>
+See the proof of Theorem 3.3 from \autocite{AC:AmjKamMoa23}.
+</p>
+
+</div>
+</div>
+</div>
+<div id="outline-container-orgd9fb8a5" class="outline-3">
+<h3 id="orgd9fb8a5"><span class="section-number-3">2.6.</span> Notations</h3>
+<div class="outline-text-3" id="text-2-6">
+<p>
+In the rest of this article, we make use of the notations listed in
+table <a href="#org5889ced">1</a>.
+</p>
+
+<table id="org5889ced" border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<caption class="t-above"><span class="table-number">Table 1:</span> Notations used in this article.</caption>
+
+<colgroup>
+<col  class="org-left" />
+</colgroup>
+
+<colgroup>
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">notation</th>
+<th scope="col" class="org-left">description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">\(s\)</td>
+<td class="org-left">node size</td>
+</tr>
+
+<tr>
+<td class="org-left">\(c\)</td>
+<td class="org-left">node capacity</td>
+</tr>
+
+<tr>
+<td class="org-left">\(\ell\)</td>
+<td class="org-left">label</td>
+</tr>
+
+<tr>
+<td class="org-left">\(v\)</td>
+<td class="org-left">value</td>
+</tr>
+
+<tr>
+<td class="org-left">\(d\)</td>
+<td class="org-left">depth</td>
+</tr>
+
+<tr>
+<td class="org-left">\(n\)</td>
+<td class="org-left">number of branches selected for compaction</td>
+</tr>
+
+<tr>
+<td class="org-left">\(B\)</td>
+<td class="org-left">upper-bound on the number of bindings</td>
+</tr>
+
+<tr>
+<td class="org-left">\(L\)</td>
+<td class="org-left">upper-bound on the number of labels</td>
+</tr>
+
+<tr>
+<td class="org-left">\(N\)</td>
+<td class="org-left">upper-bound on the number of tree leaves</td>
+</tr>
+
+<tr>
+<td class="org-left">\(V\)</td>
+<td class="org-left">upper-bound on the maximum label volume</td>
+</tr>
+
+<tr>
+<td class="org-left">\(\phi\)</td>
+<td class="org-left">\((s,D)\)-tree-encryption-scheme simulator</td>
+</tr>
+
+<tr>
+<td class="org-left">\(\psi\)</td>
+<td class="org-left">\(\ploc\) simulator</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div id="outline-container-org63ce6ee" class="outline-2">
+<h2 id="org63ce6ee"><span class="section-number-2">3.</span> Description</h2>
+<div class="outline-text-2" id="text-3">
+</div>
+<div id="outline-container-org42f00fc" class="outline-3">
+<h3 id="org42f00fc"><span class="section-number-3">3.1.</span> \(\ploc\)</h3>
+<div class="outline-text-3" id="text-3-1">
+<p>
+The complete  algorithm is given  in appendix <a href="#org9b8133a">10.5</a><sup><a id="fnr.1" class="footref" href="#fn.1" role="doc-backlink">1</a></sup>. We have chosen to implement it in the Scheme
+programming language \autocite{10.5555/1618542} for  its well-defined semantics and
+conciseness<sup><a id="fnr.2" class="footref" href="#fn.2" role="doc-backlink">2</a></sup>,  which incidentally  provides a
+reference implementation for  \(\ploc\).  A description of the  syntax required to
+understand  this code  is provided  in  appendix <a href="#orgacfda51">9</a>.  The  present
+section details the most important aspects of the algorithm step by step.  It is
+assumed that the following names are in scope:
+</p>
+<ul class="org-ul">
+<li><code>c</code> the capacity of each node (i.e. the maximum number of datums they can
+store);</li>
+<li><code>n</code> the (64-bit) number of branches to compact per insertion;</li>
+<li><code>B</code> the (64-bit) maximum number of bindings allowed;</li>
+<li><code>V</code> the (64-bit) maximum volume allowed;</li>
+<li><code>(rng)</code> a cryptographic random-number generator producing 64-bit values;</li>
+<li><code>(H key label volume)</code> a cryptographic hash function taking as input a 128-bit
+key,  a label  bit-string of  arbitrary size  and an  integer, and  produces a
+128-bit   integer.   Its  only   required   security   guarantee  is   to   be
+indistinguishable from a pseudo-random function;</li>
+</ul>
+<p>
+Since \(\ploc\)  is based on  a complete binary tree  of \(N\) leaves,  we introduce
+here  some vocabulary  used to  describe trees.   A <i>branch</i>  is defined  as the
+bit-string representing  the choices to be  made at each level  between the left
+and the right child of a node. This bit-string is encoded as an integer in which
+the choice made at the root is encoded by the bit of exponent zero.  This choice
+of representation  allows for  efficient and simple  tree traversals.   A branch
+needs not be  smaller that \(N\) since  the bits following the first  \(\lg N\) ones
+are ignored by  the traversal.  This allows  using the output of  <code>H</code> as branch.
+The <i>ID</i> of a given node at depth \(d\)  is the prefix of length \(d\) of any branch
+to which  this node  belongs: it  is therefore  the bit-string  representing the
+sequence of choices made at each level from the root to that node, encoded as an
+integer the same way a branch is.
+</p>
+
+<p>
+To manipulate  this complete binary  tree, \(\ploc\)  relies on a  \((s, N)\)-tree
+encryption  scheme  which  is   formally  defined  in  section <a href="#org157ed93">3.2</a>. This scheme exposes the following operations:
+</p>
+<ul class="org-ul">
+<li><code>(tree-setup)</code> creates  a server-side  encrypted complete  binary tree  of <code>N</code>
+leaves and returns a freshly generated key;</li>
+<li><code>(tree-fetch key branches)</code> returns the  subtree defined by the given branches
+from the main tree;</li>
+<li><code>(tree-merge key  subtree)</code> merges  the given  subtree with  the main  tree by
+replacing all the main-tree branches by their equivalent subtree branches.</li>
+</ul>
+</div>
+<div id="outline-container-org9bd2c22" class="outline-4">
+<h4 id="org9bd2c22"><span class="section-number-4">3.1.1.</span> Setup procedure</h4>
+<div class="outline-text-4" id="text-3-1-1">
+<p>
+The setup simply consists in initializing the server-side tree used by \(\ploc\):
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme" id="org0dfad6b">(<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">ploc-setup</span>) (tree-setup))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orga67fc42" class="outline-4">
+<h4 id="orga67fc42"><span class="section-number-4">3.1.2.</span> Insertion procedure</h4>
+<div class="outline-text-4" id="text-3-1-2">
+<p>
+In \(\ploc\) as in most SSE, inserting requires the client to store the volumes of
+each label. This can be done using a hash-map:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme" id="org366b4e1">(<span style="color: #1054AF; font-weight: bold;">define</span> <span style="color: #444444;">volumes</span> (make-hmap))
+
+(<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">get-volume</span> label)
+  (hmap-find volumes label 0))
+
+(<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">increment-volume</span> label)
+  (<span style="color: #1054AF; font-weight: bold;">let</span> ((volume (get-volume label)))
+    (hmap-bind! volumes label (+ volume 1))))
+</pre>
+</div>
+<p>
+Each binding  is stored  wrapped inside  a <i>datum</i> that  holds both  the indexed
+value, and a branch index called <i>target</i>.
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme" id="org1e739ff">(<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">new-datum</span> target value)
+  (vector target value))
+
+(<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">datum-&gt;target</span> datum) (vector-ref datum 0))
+(<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">datum-&gt;value</span>  datum) (vector-ref datum 1))
+</pre>
+</div>
+<p>
+The target is a pseudo-random number computed using the cryptographic hash <code>H</code>
+and the <code>key</code>.
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme" id="org0f81fe0">(<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">get-target</span> key label volume)
+  (H key label volume))
+</pre>
+</div>
+<div class="org-src-container">
+<pre class="src src-scheme" id="orgbef7ad7">(<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">make-datum</span> key label value)
+  (<span style="color: #1054AF; font-weight: bold;">let*</span> ((volume (get-volume label))
+         (target (get-target key label volume)))
+    (new-datum target value)))
+</pre>
+</div>
+<p>
+Storing  the  target  branch  in  each datum  enables  future  modifications  to
+<i>compact</i> the  tree while maintaining the  invariant (<b>I</b>) each datum  is on its
+target branch, and the post-condition (<b>P</b>) no datum can be pushed further down.
+</p>
+
+<p>
+The compaction is performed on a subtree  extracted from the main tree using the
+<code>tree-fetch</code> procedure.  The branches used  to select this subtree are generated
+using  a  procedure  of  no  argument called  a  <i>scheduler</i>.   Some  scheduling
+strategies are better than others.  Indeed, if  the same set of branches were to
+be constantly scheduled for compaction, the  datums which target branches have a
+small intersection with  this set of branches would accumulate  near the root of
+the tree, eventually causing  an overflow when no space can be  found to place a
+new  datum. We  therefore  choose a  scheduling strategy  that  sweeps the  tree
+branches in  a regular and  uniform way:  the lower bits  are all covered  by at
+least  one of  the branches  and  each branch  covers  the remaining  bits in  a
+circular fashion.  For  example with \(N=8\) and \(n=2\), the  two upper-most levels
+representing the  two lowest bits  are all covered.  Then,  at each call  to the
+scheduler, these  bits are prepended  the bits  generated by selecting  the next
+integer, resulting in the subtrees depicted in Figure \ref{fig:scheduling}.  The
+following  <code>make-scheduler</code> procedure  generates  a  stateful scheduler  drawing
+batches of <code>n</code> branches.
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme" id="org3faaf8b">(<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">make-scheduler</span> n)
+    (assert (integer? (lg n)))
+    (<span style="color: #1054AF; font-weight: bold;">let</span> ((counter 0) (prefixes (iota n)))
+      (<span style="color: #1054AF; font-weight: bold;">&#955;</span> ()
+        (<span style="color: #1054AF; font-weight: bold;">set!</span> counter (+ counter 1))
+        (<span style="color: #1054AF; font-weight: bold;">map</span> (<span style="color: #1054AF; font-weight: bold;">&#955;</span> (pfx) (+ pfx (* counter n)))
+             prefixes))))
+</pre>
+</div>
+<div class="org-src-container">
+<pre class="src src-scheme" id="org89e2c70">(<span style="color: #1054AF; font-weight: bold;">define</span> <span style="color: #444444;">scheduler</span> (make-scheduler n))
+</pre>
+</div>
+<p>
+The compaction is a recursive procedure:  it accumulates the data targeting each
+leaf on its way  down, and stores it back to the tree  on its way up, saturating
+the  nodes  with the  <code>c</code>  first  remaining  datums  selected using  the  <code>take</code>
+procedure.
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme" id="org8ac7afc">(<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">take</span> n xs)
+  (<span style="color: #1054AF; font-weight: bold;">let</span> <span style="color: #444444;">loop</span> ((n n) (xs xs) (taken (list)))
+    (<span style="color: #1054AF; font-weight: bold;">if</span> (<span style="color: #1054AF; font-weight: bold;">or</span> (zero? n) (null? xs))
+        (values taken xs)
+        (loop (- n 1) (cons (head xs) taken) (tail xs)))))
+</pre>
+</div>
+<p>
+At each  level, to tell  apart data targeting the  left and right  subtrees, the
+procedure <code>(split-with pred? xs)</code> is used.  It returns two lists: one containing
+values that match the given predicate and one containing those that don't.
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme" id="orgb468a20">(<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">split-with</span> pred? xs)
+  (<span style="color: #1054AF; font-weight: bold;">let</span> <span style="color: #444444;">loop</span> ((xs xs) (lhs (list)) (rhs (list)))
+    (<span style="color: #1054AF; font-weight: bold;">match</span> xs
+      ((x . xs) (<span style="color: #1054AF; font-weight: bold;">if</span> (pred? x)
+                    (loop xs (cons x lhs) rhs)
+                    (loop xs lhs (cons x rhs))))
+      (()       (values lhs rhs)))))
+</pre>
+</div>
+<p>
+The predicate  <code>(go-left? depth branch)</code>  returns whether the choice  encoded at
+the given depth in the given branch is to select the left child.
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme" id="org0d1ebff">(<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">go-left?</span> depth branch)
+  (zero? (&amp;&amp; (&lt;&lt; 1 depth) branch)))
+</pre>
+</div>
+<div class="org-src-container">
+<pre class="src src-scheme" id="orgb317ec1">(<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">compact</span> node depth data)
+  (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">left-datum?</span> datum)
+    (go-left? depth (datum-&gt;target datum)))
+  (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">direct-data</span> data)
+    (split-with left-datum? data))
+  (<span style="color: #1054AF; font-weight: bold;">match</span> node
+    (#(node-data l-child r-child)
+     (<span style="color: #1054AF; font-weight: bold;">let*-values</span>
+         (((l-data  r-data) (direct-data (append node-data data)))
+          ((l-child l-data) (compact l-child (+ depth 1) l-data))
+          ((r-child r-data) (compact r-child (+ depth 1) r-data))
+          ((node-data rest) (take c (append l-data r-data))))
+       (values (make-node node-data l-child r-child) rest)))
+    (_ (values node data))))
+</pre>
+</div>
+<p>
+The preservation  of the invariant <b>I</b>,  can be proven by  recurrence by showing
+that a  datum is  accumulated up  to the last  node in  the intersection  of its
+target branch with the fetched subtree.  This proof relies on the correctness of
+the <code>left-datum?</code> and <code>split-with</code> procedures and the use of sentinel nodes that
+make processing the last node of the intersection like any other node. Once this
+is done,  the rest of  the proof  follows trivially since  the nodes in  which a
+datum can be placed back are the  nodes visited during the recursive calls which
+have been proven to belong to its target branch. Proving <b>P</b> is simple since the
+backtracking saturates  the lower nodes first,  until there is no  datum left or
+the tree overflows.
+</p>
+
+<p>
+In order to insert a new datum, \(\ploc\) simply calls the compaction procedure on
+a truly random subtree with this datum.
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme" id="org48cfa71">(<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">ploc-insert</span> key label value)
+  (<span style="color: #1054AF; font-weight: bold;">let</span> ((data    (list (make-datum key label value)))
+        (subtree (tree-fetch key (scheduler))))
+    (<span style="color: #1054AF; font-weight: bold;">let-values</span> (((subtree data) (compact subtree 0 data)))
+      (<span style="color: #1054AF; font-weight: bold;">unless</span> (null? data)
+        (error <span style="color: #880000;">"tree overflow"</span> subtree label value))
+      (increment-volume label)
+      (tree-merge key subtree))))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org22a540f" class="outline-4">
+<h4 id="org22a540f"><span class="section-number-4">3.1.3.</span> Search procedure</h4>
+<div class="outline-text-4" id="text-3-1-3">
+<p>
+The search  procedure is much simpler:  it fetches the subtree  generated by all
+branches possibly targeted by values indexed under the searched label,
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme" id="orgbe0fd9f">(<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">get-all-targets</span> key label)
+  (<span style="color: #1054AF; font-weight: bold;">map</span> (<span style="color: #1054AF; font-weight: bold;">&#955;</span> (v) (get-target key label v))
+       (iota V)))
+</pre>
+</div>
+<p>
+and for  each target branch,  filters out data  that doesn't target  the correct
+label.
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme" id="org373c5bb">(<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">find-data</span> subtree target)
+  (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">matching-datum?</span> datum)
+    (= (datum-&gt;target datum) target))
+  (filter matching-datum? (branch-data subtree target)))
+</pre>
+</div>
+<p>
+Only  one datum  per  target  should be  found  since  <code>target</code> contains  enough
+entropy.
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme" id="org483a64c">(<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">ploc-search</span> key label)
+  (<span style="color: #1054AF; font-weight: bold;">let*</span> ((targets  (get-all-targets key label))
+         (subtree  (tree-fetch key targets)))
+    (reverse
+     (foldl (<span style="color: #1054AF; font-weight: bold;">&#955;</span> (result target)
+              (<span style="color: #1054AF; font-weight: bold;">match</span> (find-data subtree target)
+                (()      result)
+                ((datum) (cons (datum-&gt;value datum) result))
+                ( data   (error ploc-search
+                                <span style="color: #880000;">"more than one datum found"</span>
+                                data))))
+            (list)
+            targets))))
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-org157ed93" class="outline-3">
+<h3 id="org157ed93"><span class="section-number-3">3.2.</span> Tree Encryption Scheme</h3>
+<div class="outline-text-3" id="text-3-2">
+<p>
+\(\ploc\)  relies on  a  \((s, N)\)-Tree  STE scheme,  defined  as the  structured
+encryption scheme  based on  the ADT  parameterized by \(s\)  and $N,  which valid
+states are the  complete binary trees of  \(N\) leaves and nodes of  size \(s\), and
+which operations are:
+</p>
+<ul class="org-ul">
+<li>\((t, T')  \gets \Fetch(\mathrm{branches},  T)\), that  returns the  subtree \(t\)
+defined by the given branches in \(T\);</li>
+<li>\((\bot, T')  \gets \Merge(t, T)\)  that merges the  given subtree \(t\)  with the
+tree \(T\) by replacing  all tree nodes by their equivalent  in the subtree when
+it exists.</li>
+</ul>
+<p>
+The present section describes an  implementation of this scheme for completeness
+only: since  it is used as  a black-box by \(\ploc\),  and in order to  reduce the
+length of the present article, the  security proof of this implementation is not
+given.  Following  the design  choices discussed  in \autocite{EPRINT:BreHeb24}, we
+rely on  a server abstraction  exposing a linear  128-bit memory space  with the
+following operations:
+</p>
+<ul class="org-ul">
+<li><code>(memory-setup)</code> initializes a new server-side abstraction of a 128-bit linear
+memory space;</li>
+<li><code>(memory-read addresses)</code>  atomically reads  from given addresses  and returns
+the list  of words bound  to these addresses, or  the special value  <code>free</code> in
+case no word was found;</li>
+<li><code>(memory-write bindings)</code> atomically writes the given bindings to memory.</li>
+</ul>
+<p>
+Additionally, the present implementation  depends on an authenticated encryption
+scheme like AES256-GCM.
+</p>
+</div>
+<div id="outline-container-org3a6e4ce" class="outline-4">
+<h4 id="org3a6e4ce"><span class="section-number-4">3.2.1.</span> Tree representation</h4>
+<div class="outline-text-4" id="text-3-2-1">
+<p>
+A tree node is represented as a vector containing its data and a pointer to both
+its children.
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme" id="orga71f5cd">(<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">make-node</span> data l-child r-child)
+  (vector data l-child r-child))
+
+(<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">node-&gt;data</span>    node) (vector-ref node 0))
+(<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">node-&gt;l-child</span> node) (vector-ref node 1))
+(<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">node-&gt;r-child</span> node) (vector-ref node 2))
+</pre>
+</div>
+<p>
+In order to fit  a tree into a linear memory, we need  to associate each node to
+an address. We choose  to index each node using the  pair <code>(depth node-id)</code>. The
+node ID of the root is 0, and subsequent node IDs may be computed as follows:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme" id="org023e3f6">(<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">l-child-id</span> node-id) (+ (&lt;&lt; node-id 1) 0))
+(<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">r-child-id</span> node-id) (+ (&lt;&lt; node-id 1) 1))
+
+(<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">next-node-id</span> node-id depth target)
+  (<span style="color: #1054AF; font-weight: bold;">if</span> (go-left? depth target)
+      (l-child-id node-id)
+      (r-child-id node-id)))
+</pre>
+</div>
+<p>
+Computing  the address  of  a  node therefore  simply  consists  in hashing  its
+associated <code>(dept node-id)</code> onto 128 bits  using the hash function <code>G</code>, which is
+only required to have a good-enough collision resistance.
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme" id="org9b21abc">(<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">make-address</span> node-id depth) (G node-id depth))
+</pre>
+</div>
+<p>
+Finally, we  can write helpers to  flatten a tree into  bindings and vice-versa.
+The  <code>tree-&gt;bindings</code> procedure  takes as  argument  a tree  and a  <code>data-&gt;word</code>
+procedure, and returns a list of memory bindings encoding this tree.
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme" id="orga0df67f">(<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">tree-&gt;bindings</span> tree data-&gt;word)
+  (<span style="color: #1054AF; font-weight: bold;">let</span> <span style="color: #444444;">loop</span> ((node tree) (node-id 0) (depth 0))
+    (<span style="color: #1054AF; font-weight: bold;">match</span> node
+      (#(data l-child r-child)
+       (<span style="color: #1054AF; font-weight: bold;">let</span> ((address (make-address node-id depth))
+             (word    (data-&gt;word data)))
+         (append (list (cons address word))
+                 (loop l-child (l-child-id node-id) (+ depth 1))
+                 (loop r-child (r-child-id node-id) (+ depth 1)))))
+      (_ (list)))))
+</pre>
+</div>
+<p>
+The <code>bindings-&gt;tree</code> procedure  takes as argument <code>get-word</code>,  which returns the
+word bound to the given address, <code>free</code>  if this address is free and <code>unread</code> if
+this address is not  part of the target set, and  <code>word-&gt;data</code> which returns the
+data encoded by a given word.
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme" id="orgaa76df3">(<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">bindings-&gt;tree</span> get-word word-&gt;data)
+  (<span style="color: #1054AF; font-weight: bold;">define</span> <span style="color: #444444;">sentinel</span> (list))
+  (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">unread?</span> word) (eq? word 'unread))
+  (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">free?</span>   word) (eq? word 'free))
+  (<span style="color: #1054AF; font-weight: bold;">let</span> <span style="color: #444444;">loop</span> ((node-id 0) (depth 0))
+    (<span style="color: #1054AF; font-weight: bold;">let*</span> ((address (make-address node-id depth))
+           (word    (get-word address)))
+      (<span style="color: #1054AF; font-weight: bold;">if</span> (unread? word)
+          sentinel
+          (make-node (<span style="color: #1054AF; font-weight: bold;">if</span> (free? word) (list) (word-&gt;data word))
+                     (loop (l-child-id node-id) (+ depth 1))
+                     (loop (r-child-id node-id) (+ depth 1)))))))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgec245d8" class="outline-4">
+<h4 id="orgec245d8"><span class="section-number-4">3.2.2.</span> Setup</h4>
+<div class="outline-text-4" id="text-3-2-2">
+<p>
+The <code>tree-setup</code>  simply consists  in setting-up a  new server-side  memory, and
+returning  a fresh  AE key.   Not initializing  the tree  avoids a  \(O(N)\) setup
+without leaking  any additional  information in the  persistent-adversary model,
+which  is  why  we  designed  the  <code>bindings-&gt;tree</code>  operation  to  be  able  to
+distinguish free addresses from unread addresses,  and to consider the former as
+empty nodes.
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme" id="orga04c0d2">(<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">tree-setup</span>)
+  (memory-setup)
+  (AE-keygen))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgd583981" class="outline-4">
+<h4 id="orgd583981"><span class="section-number-4">3.2.3.</span> Fetch</h4>
+<div class="outline-text-4" id="text-3-2-3">
+<p>
+Fetching simply consists  in deriving the addresses of each  node in the subtree
+defined by  the given leaf  IDs, reading them  from memory, decrypting  them and
+extracting  the data  they contain.  In  order to  derive the  addresses of  the
+subtree,  we  use a  naive  approach  deriving  the  addresses defined  by  each
+branches, adding  them into a  hash-set to  guarantee unicity and  returning the
+list of addresses it contains once the addresses defined by each branch has been
+added to it.
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme" id="org15cac86">(<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">subtree-addresses</span> branches)
+  (hset-&gt;list
+   (foldl (<span style="color: #1054AF; font-weight: bold;">&#955;</span> (addresses branch)
+            (foldl hset-add!
+                   addresses
+                   (branch-addresses branch)))
+          (make-hset)
+          branches)))
+</pre>
+</div>
+<p>
+The addresses defined by each branch are derived in a straightforward, recursive
+manner.
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme" id="orgaa97905">(<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">branch-addresses</span> branch)
+  (<span style="color: #1054AF; font-weight: bold;">let</span> <span style="color: #444444;">loop</span> ((node-id 0) (depth 0))
+    (<span style="color: #1054AF; font-weight: bold;">if</span> (&lt; max-depth depth)
+        (list)
+        (cons (make-address node-id depth)
+              (loop (next-node-id node-id depth branch)
+                    (+ depth 1))))))
+</pre>
+</div>
+<p>
+We can now  write the complete <code>tree-fetch</code> procedure which  proceeds by reading
+all subtree addresses  from the server, and building the  subtree by recursively
+finding the data corresponding  to each node, from the root.  Note that the call
+to <code>hmap-find</code> here returns the special value <code>unread</code>.
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme" id="orgc3298b8">(<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">tree-fetch</span> key branches)
+  (<span style="color: #1054AF; font-weight: bold;">define</span> <span style="color: #444444;">AE</span> (AE-init key))
+  (<span style="color: #1054AF; font-weight: bold;">let*</span> ((addresses (subtree-addresses branches))
+         (words     (memory-read addresses))
+         (bindings  (foldl hmap-bind! (make-hmap) addresses words)))
+    (bindings-&gt;tree
+     (<span style="color: #1054AF; font-weight: bold;">&#955;</span> (address) (hmap-find bindings address 'unread))
+     (<span style="color: #1054AF; font-weight: bold;">&#955;</span> (bytes) (bytes-&gt;data (AE-decrypt AE bytes))))))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org32b3a0d" class="outline-4">
+<h4 id="org32b3a0d"><span class="section-number-4">3.2.4.</span> Merge</h4>
+<div class="outline-text-4" id="text-3-2-4">
+<p>
+Merging a tree simply consists in going through each node and to generate its
+associated binding, and finally to write all the generated bindings server-side.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme" id="org09d14dc">(<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">tree-merge</span> key subtree)
+  (<span style="color: #1054AF; font-weight: bold;">define</span> <span style="color: #444444;">AE</span> (AE-init key))
+  (<span style="color: #1054AF; font-weight: bold;">let</span> ((data-&gt;word (<span style="color: #1054AF; font-weight: bold;">&#955;</span> (data) (AE-encrypt AE (data-&gt;bytes data)))))
+    (memory-write (tree-&gt;bindings subtree data-&gt;word))
+    (values)))
+</pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-org3cd108a" class="outline-2">
+<h2 id="org3cd108a"><span class="section-number-2">4.</span> Security analysis</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+In this section,  we assume the existence  of a \(\cL_{\tau}\)-adaptively-secure
+\((s, N)\)-tree encryption scheme, where \(\cL_\tau\) is defined as follow:
+</p>
+<ul class="org-ul">
+<li>\(\cL_{\tau}(\Setup) = \Setup\);</li>
+<li>\(\cL_{\tau}(\Fetch, \{b_i\}) = (\Fetch, \{b_i\})\);</li>
+<li>\(\cL_{\tau}(\Merge, \mathrm{subtree}) = (\Merge, \{b_i\})\).</li>
+</ul>
+<p>
+That is, the  tree encryption scheme operations only leak  the branches defining
+the subtree they are working on.  Such  a scheme is actually trivial to designed
+and one possible implementation is described in section <a href="#org157ed93">3.2</a>.
+</p>
+
+<div class="theorem" id="orgcd818df">
+<p>
+Given a \(\cL_{\tau}\)-adaptively-secure \((s,  N)\)-tree encryption scheme with
+public  parameters  \(pp_{\tau}\),  \(\ploc\) is  a  \(\cL_{\pi}\)-adaptively-secure
+\((\bbL,\bbV)\)-multi-map encryption scheme  with public parameters \((pp_{\tau},
+c,  n, B,  V)\), where  \(s =  c\lg|\bbV|\), \(N=B\)  and \(\cL_{\pi}\)  is defined  as
+follows:
+</p>
+<ul class="org-ul">
+<li>\(\cL_{\pi}(\Setup) = \Setup\)</li>
+<li>\(\cL_{\pi}(\Search, \ell) = (\Search, \spattern)\)</li>
+<li>\(\cL_{\pi}(\Insert, \ell, v) = \Insert\)</li>
+</ul>
+
+</div>
+
+<div class="proof" id="org1082835">
+<p>
+Given the  domain \(\bbL\) and codomain  \(\bbV\), the public parameters  \((c, n, B,
+V)\), and a  \(\cL_{\tau}\)-adaptively-secure \((c\lg|\bbV|, B)\)-tree encryption
+scheme   with   public   parameters   \(pp_\tau\),  there   exists   a   simulator
+\(\phi_{pp_\tau}\)    such    that    \(\phi_{pp_\tau}   \circ    \cL_{\tau}\)    is
+indistinguishable  from  a  legitimate   tree-encryption-scheme  client  in  the
+security  game given  in  <a href="#org5356349">2.4</a>.   In the  following
+sections, we show how to build  a simulator \(\psi^{pp_{\tau}}_{c, n, B, V}\) such
+that \(\psi^{pp_{\tau}}_{c, n,  B, V} \circ \cL_\pi\) is  indistinguishable from a
+legitimate \(\ploc\) client in  the same game.  The full code  of the simulator is
+given in section <a href="#org5ff4522">4.5</a>.
+</p>
+
+</div>
+
+<p>
+Note that  in the implementation  given in section <a href="#org157ed93">3.2</a>, the
+only tree-encryption-scheme public parameter is the encryption overhead.
+</p>
+
+<div class="corollary" id="org5f19341">
+<p>
+Given a \(\cL_{\tau}\)-adaptively-secure \((s,  N)\)-tree encryption scheme with
+public    parameters    \(pp_{\tau}\),     \(\ploc\)    is    an    injection-secure
+\((\bbL,\bbV)\)-multi-map encryption scheme  with public parameters \((pp_{\tau},
+c, n, B, V)\), where \(s = c\lg|\bbV|\), \(N = B\).
+</p>
+
+</div>
+
+<div class="proof" id="org4db5c25">
+<p>
+Direct using the sufficient condition from \autocite{AC:AmjKamMoa23}.
+</p>
+
+</div>
+</div>
+<div id="outline-container-org202c7c4" class="outline-3">
+<h3 id="org202c7c4"><span class="section-number-3">4.1.</span> Setup</h3>
+<div class="outline-text-3" id="text-4-1">
+<p>
+Recall the \(\ploc\) setup simply calls the  tree setup, which only leaks the name
+of the operation:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme" id="orgf6e7c6a">(<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">psi-setup</span>) (phi 'setup))
+</pre>
+</div>
+<p>
+Therefore,  a \(\ploc\)  setup only  has trivial  leakages: \[\cL_\pi(\Setup)  =
+\Setup.\]
+</p>
+</div>
+</div>
+<div id="outline-container-org18d1ee2" class="outline-3">
+<h3 id="org18d1ee2"><span class="section-number-3">4.2.</span> Search</h3>
+<div class="outline-text-3" id="text-4-2">
+<p>
+In a nutshell, the only client-server interaction performed by a search consists
+in fetching  the subtree targeted  by the  searched label.  In  particular, this
+subtree does not depend on the volume of this label but on \(V\) which is a public
+\(\ploc\) parameter.  Then by security  of the  tree scheme, reading  this subtree
+only leaks  the branches  that generate it,  which in turn  only depends  on the
+search pattern which is therefore the only non-trivial leakage.
+</p>
+
+<p>
+Recall the search operation works as follows:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">get-target</span> key label volume)
+  (H key label volume))
+
+(<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">get-all-targets</span> key label)
+  (<span style="color: #1054AF; font-weight: bold;">map</span> (<span style="color: #1054AF; font-weight: bold;">&#955;</span> (v) (get-target key label v))
+       (iota V)))
+
+(<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">find-data</span> subtree target)
+  (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">matching-datum?</span> datum)
+    (= (datum-&gt;target datum) target))
+  (filter matching-datum? (branch-data subtree target)))
+
+(<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">ploc-search</span> key label)
+  (<span style="color: #1054AF; font-weight: bold;">let*</span> ((targets  (get-all-targets key label))
+         (subtree  (tree-fetch key targets)))
+    (reverse
+     (foldl (<span style="color: #1054AF; font-weight: bold;">&#955;</span> (result target)
+              (<span style="color: #1054AF; font-weight: bold;">match</span> (find-data subtree target)
+                (()      result)
+                ((datum) (cons (datum-&gt;value datum) result))
+                ( data   (error ploc-search
+                                <span style="color: #880000;">"more than one datum found"</span>
+                                data))))
+            (list)
+            targets))))
+</pre>
+</div>
+<p>
+It can  be transformed without  adversarial advantage into a  procedure ignoring
+the fetched tree:
+</p>
+<pre class="example" id="orge276890">
+@@ -5,21 +5,7 @@
+   (map (λ (v) (get-target key label v))
+        (iota V)))
+
+-(define (find-data subtree target)
+-  (define (matching-datum? datum)
+-    (= (datum-&gt;target datum) target))
+-  (filter matching-datum? (branch-data subtree target)))
+-
+ (define (ploc-search key label)
+-  (let* ((targets  (get-all-targets key label))
+-         (subtree  (tree-fetch key targets)))
+-    (reverse
+-     (foldl (λ (result target)
+-              (match (find-data subtree target)
+-                (()      result)
+-                ((datum) (cons (datum-&gt;value datum) result))
+-                ( data   (error ploc-search
+-                                "more than one datum found"
+-                                data))))
+-            (list)
+-            targets))))
++  (let* ((targets (get-all-targets key label))
++         (subtree (tree-fetch key targets)))
++    (values)))
+</pre>
+<p>
+which gives:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">get-target</span> key label volume)
+  (H key label volume))
+
+(<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">get-all-targets</span> key label)
+  (<span style="color: #1054AF; font-weight: bold;">map</span> (<span style="color: #1054AF; font-weight: bold;">&#955;</span> (v) (get-target key label v))
+       (iota V)))
+
+(<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">ploc-search</span> key label)
+  (<span style="color: #1054AF; font-weight: bold;">let*</span> ((targets (get-all-targets key label))
+         (subtree (tree-fetch key targets)))
+    (values)))
+</pre>
+</div>
+<p>
+In the oracle model, we can replace the keyed hash function with a negligible
+adversarial advantage by a call to a PRF and inline this call.
+</p>
+<pre class="example" id="orgec4c1ea">
+@@ -1,11 +1,4 @@
+-(define (get-target key label volume)
+-  (H key label volume))
+-
+-(define (get-all-targets key label)
+-  (map (λ (v) (get-target key label v))
+-       (iota V)))
+-
+ (define (ploc-search key label)
+-  (let* ((targets (get-all-targets key label))
++  (let* ((targets (map (λ (v) (PRF label v)) (iota V)))
+          (subtree (tree-fetch key targets)))
+     (values)))
+</pre>
+<p>
+which gives:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">ploc-search</span> key label)
+  (<span style="color: #1054AF; font-weight: bold;">let*</span> ((targets (<span style="color: #1054AF; font-weight: bold;">map</span> (<span style="color: #1054AF; font-weight: bold;">&#955;</span> (v) (PRF label v)) (iota V)))
+         (subtree (tree-fetch key targets)))
+    (values)))
+</pre>
+</div>
+<p>
+Then,  by security  of the  PRF,  the label  can  be replaced  by any  bijection
+\(f:\mathbb{L}\rightarrow [1,|\bbL|]\),  transforming the  given <code>label</code>  into its
+index <code>label-idx</code>:
+</p>
+<pre class="example">
+@@ -1,4 +1,4 @@
+-(define (ploc-search key label)
+-  (let* ((targets (map (λ (v) (PRF label v)) (iota V)))
++(define (ploc-search key label-idx)
++  (let* ((targets (map (λ (v) (PRF label-idx v)) (iota V)))
+          (subtree (tree-fetch key targets)))
+     (values)))
+</pre>
+
+<p>
+which gives:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">ploc-search</span> key label-idx)
+  (<span style="color: #1054AF; font-weight: bold;">let*</span> ((targets (<span style="color: #1054AF; font-weight: bold;">map</span> (<span style="color: #1054AF; font-weight: bold;">&#955;</span> (v) (PRF label-idx v)) (iota V)))
+         (subtree (tree-fetch key targets)))
+    (values)))
+</pre>
+</div>
+<p>
+By  security of  the tree  encryption scheme,  the call  to <code>tree-fetch</code>  can be
+replaced   by   a   call    to   \(\phi_{pp_\tau}   \circ   \cL_{\tau}\).    Since
+\(\cL_{\tau}(\Fetch,    \mathrm{targets})    =    (\Fetch,    \mathrm{targets})\),
+<code>(tree-fetch key targets)</code> is indistinguishable from <code>(phi 'fetch targets)</code>:
+</p>
+<pre class="example">
+@@ -1,4 +1,4 @@
+-(define (ploc-search key label-idx)
++(define (psi-search label-idx)
+   (let* ((targets (map (λ (v) (PRF label-idx v)) (iota V)))
+-         (subtree (tree-fetch key targets)))
++         (subtree (phi 'fetch targets)))
+     (values)))
+</pre>
+
+<p>
+which gives:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme" id="orga0a5974">(<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">psi-search</span> label-idx)
+  (<span style="color: #1054AF; font-weight: bold;">let*</span> ((targets (<span style="color: #1054AF; font-weight: bold;">map</span> (<span style="color: #1054AF; font-weight: bold;">&#955;</span> (v) (PRF label-idx v)) (iota V)))
+         (subtree (phi 'fetch targets)))
+    (values)))
+</pre>
+</div>
+<p>
+Therefore, the only non-trivial leakage of  a \(\ploc\) search is some indexing on
+the  labels,   which  is   the  definition  of   leaking  the   search  pattern:
+\[\cL_\pi(\Search, \ell) = (\Search, \spattern).\]
+</p>
+</div>
+</div>
+<div id="outline-container-orgeeb31c5" class="outline-3">
+<h3 id="orgeeb31c5"><span class="section-number-3">4.3.</span> Insert</h3>
+<div class="outline-text-3" id="text-4-3">
+<p>
+Recall the insertion works as follows:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">get-target</span> key label volume)
+  (H key label volume))
+
+(<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">make-datum</span> key label value)
+  (<span style="color: #1054AF; font-weight: bold;">let*</span> ((volume (get-volume label))
+         (target (get-target key label volume)))
+    (new-datum target value)))
+
+(<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">ploc-insert</span> key label value)
+  (<span style="color: #1054AF; font-weight: bold;">let</span> ((data    (list (make-datum key label value)))
+        (subtree (tree-fetch key (scheduler))))
+    (<span style="color: #1054AF; font-weight: bold;">let-values</span> (((subtree data) (compact subtree 0 data)))
+      (<span style="color: #1054AF; font-weight: bold;">unless</span> (null? data)
+        (error <span style="color: #880000;">"tree overflow"</span> subtree label value))
+      (increment-volume label)
+      (tree-merge key subtree))))
+</pre>
+</div>
+<p>
+and suppose for now that compaction never overflows. The insertion can therefore
+be reduced without adversarial advantage to a procedure that ignores compaction
+error:
+</p>
+<pre class="example" id="orgda72499">
+@@ -9,8 +9,6 @@
+ (define (ploc-insert key label value)
+   (let ((data    (list (make-datum key label value)))
+         (subtree (tree-fetch key (scheduler))))
+-    (let-values (((subtree data) (compact subtree 0 data)))
+-      (unless (null? data)
+-        (error "tree overflow" subtree label value))
++    (let ((subtree (compact subtree 0 data)))
+       (increment-volume label)
+       (tree-merge key subtree))))
+</pre>
+<p>
+By  security  of the  tree  encryption  scheme,  the  call to  <code>(tree-fetch  key
+targets)</code> can  be replaced with  only negligible adversarial advantage  by <code>(phi
+'fetch targets)</code>,  and the call to  <code>(tree-merge key subtree)</code> can  similarly be
+replaced by a call to <code>(phi 'merge targets)</code>.
+</p>
+<pre class="example" id="org67586c2">
+@@ -7,8 +7,9 @@
+     (new-datum target value)))
+
+ (define (ploc-insert key label value)
+-  (let ((data    (list (make-datum key label value)))
+-        (subtree (tree-fetch key (scheduler))))
+-    (let ((subtree (compact subtree 0 data)))
++  (let* ((data    (list (make-datum key label value)))
++         (targets (scheduler))
++         (subtree (phi 'fetch targets)))
++    (let ((subtree (compact subtree 0 (list datum))))
+       (increment-volume label)
+-      (tree-merge key subtree))))
++      (phi 'merge targets))))
+</pre>
+<p>
+which gives:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">get-target</span> key label volume)
+  (H key label volume))
+
+(<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">make-datum</span> key label value)
+  (<span style="color: #1054AF; font-weight: bold;">let*</span> ((volume (get-volume label))
+         (target (get-target key label volume)))
+    (new-datum target value)))
+
+(<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">ploc-insert</span> key label value)
+  (<span style="color: #1054AF; font-weight: bold;">let*</span> ((data    (list (make-datum key label value)))
+         (targets (scheduler))
+         (subtree (phi 'fetch targets)))
+    (<span style="color: #1054AF; font-weight: bold;">let</span> ((subtree (compact subtree 0 (list datum))))
+      (increment-volume label)
+      (phi 'merge targets))))
+</pre>
+</div>
+<p>
+Finally, removing unused variables can be performed without adversarial
+advantage:
+</p>
+<pre class="example" id="org1a3b521">
+@@ -1,15 +1,4 @@
+-(define (get-target key label volume)
+-  (H key label volume))
+-
+-(define (make-datum key label value)
+-  (let* ((volume (get-volume label))
+-         (target (get-target key label volume)))
+-    (new-datum target value)))
+-
+-(define (ploc-insert key label value)
+-  (let* ((data    (list (make-datum key label value)))
+-         (targets (scheduler))
+-         (subtree (phi 'fetch targets)))
+-    (let ((subtree (compact subtree 0 (list datum))))
+-      (increment-volume label)
+-      (phi 'merge targets))))
++(define (psi-insert)
++  (let ((targets (scheduler)))
++    (phi 'fetch targets)
++    (phi 'merge targets)))
+</pre>
+<p>
+which gives:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme" id="org49509f8">(<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">psi-insert</span>)
+  (<span style="color: #1054AF; font-weight: bold;">let</span> ((targets (scheduler)))
+    (phi 'fetch targets)
+    (phi 'merge targets)))
+</pre>
+</div>
+<p>
+Therefore a \(\ploc\)  insertion only has trivial leakages if  compaction does not
+overflow.  The following  section  gives  constraints on  \(c\)  to guarantee  the
+absence  of overflow  with overwhelming  probability in  the security  parameter
+\(\lambda\).
+</p>
+</div>
+</div>
+<div id="outline-container-orgbfbc5da" class="outline-3">
+<h3 id="orgbfbc5da"><span class="section-number-3">4.4.</span> Compaction overflow</h3>
+<div class="outline-text-3" id="text-4-4">
+<p>
+We need to prove two different properties of the compaction process:
+</p>
+<ul class="org-ul">
+<li>a static property \(\mathbf{S}\) guaranteeing that the tree does not overflow in
+its maximally compacted  state. This is a classic requirement  with which most
+tree  algorithms  need  to  comply  and  has a  well  known  solution  in  the
+balls-and-bins model (see for example \autocite{10.1007/3-540-49543-6_13}): it is
+enough to  allocate \(\frac{B}{N} + \frac{a\ln  N}{\ln \ln N}\), \(a>1\)  slots to
+each leaf in order to guarantee \(\mathbf{S}\) with a probability in \(1 - o(1)\),
+where \(N\) is the number of leaves in  the tree, \(B\) the total number of values
+inserted (which  we shall call  bindings in  our context). However,  since the
+absence of overflow is critical for the rest of the security proof to hold, we
+will  need  to  work  out  the  proof  of  an  upper  bound  with  probability
+\(1-2^{-\lambda}\).</li>
+<li>a dynamic property \(\bD\) guaranteeing that a congestion leading to an overflow
+at the  root only  happen with  a probability negligible  in \(\lambda\)  in the
+worst case.  To the  best of our  knowledge, this kind  of probability  is not
+standard.</li>
+</ul>
+
+<p>
+First,  recall that  given a  random variable  \(X\) following  a binomial  law of
+parameter        \(B\)        and        \(p\),        the        Chernoff-Hoeffding
+theorem \autocite{chernoff_1952,Hoeffding1963probabilityif}  allows  bounding  the
+probability of the upper tail of that distribution:
+</p>
+<p>
+In what follows, we will be are interested in finding the smallest integer value
+of \(k\) such  that \(m \times P(X  \ge k) \le 2^{-\lambda}\)  for some multiplicity
+\(m\) which value will depend on the proof. We therefore pose:
+</p>
+<p>
+and  call \(k^{\lambda,  m}_{B, p}  =  \lceil x(B,  p, \lambda)  \rceil -1\),  the
+smallest  integer  such  that  \(P(X  \le  k^{\lambda,  m}_{B,  p})\)  holds  with
+overwhelming probability.
+</p>
+</div>
+<div id="outline-container-org519d4c7" class="outline-4">
+<h4 id="org519d4c7"><span class="section-number-4">4.4.1.</span> Static bound</h4>
+<div class="outline-text-4" id="text-4-4-1">
+<p>
+Since \(\ploc\) guarantees that the target leaves are selected using a PRF that is
+never called twice with the same inputs,  we can consider the number of bindings
+targeting a  leaf node to follow  a binomial law of  parameter \(B = N\)  and \(p =
+N^{-1}\).  Therefore we have: \[P\left(\max_{1\le i  \le N} X_i \ge k \right) \le
+N \times  P(X_1 \ge k)\] and  maximum number of  bindings received in a  leaf is
+\(k^{\lambda,  N}_{  N,  N^{-1}}\)  with overwhelming  probability  in  \(\lambda\).
+Rather than allocating  each leaf with this  capacity, we rely on  the fact that
+\(\bS\) is a static property that must only hold for the maximally compacted state
+of the tree.  We  can thus use slots from the parent  nodes to store overflowing
+values.  Let us count the number  \(\omega(c, d, b)\) of bindings overflowing from
+a node at level \(d\) knowing that  \(b\) bindings have been inserted in its subtree
+and each  node has  a capacity  \(c\).  In the  worst case,  all the  bindings are
+stored  in  a contiguous  region  of  the  tree.  Calling  \(k_{b,d}^{\lambda}  =
+k_{b,2^{-d}}^{\lambda,  2^d}\), we  can bound  \(\omega^{\lambda}_c(b, d)\)  by the
+overflow of  its left subtree in  which at most \(k^{\lambda}_{B,  d+1}\) bindings
+have  been  inserted, plus  the  overflow  of its  right  subtree  in which  the
+remaining   bindings    have   been   inserted,   minus    its   capacity   \(c\):
+\[\omega^{\lambda}_c( b,  d) =  \omega^{\lambda}_c(\min(b, k^{\lambda}_{B,d+1}),
+d+1) + \omega^{\lambda}_c(b- \min(b,k^{\lambda}_{B, d+1}),  d+1) - c,\] with the
+border condition: \(\omega^{\lambda}_c(b,  \lg N) = b -  c\).  Hence, guaranteeing
+\(\mathbf{S}\)   can  be   done   by   choosing  a   value   of   \(c\)  such   that
+\(\omega^{\lambda}_c(B, 0) = 0\), which is  easy using a numerical application (cf
+tables                  <a href="#orgc8582ff">2</a>                  and
+<a href="#orgdc69fc3">3</a> below).
+</p>
+</div>
+</div>
+<div id="outline-container-orgf8f2f95" class="outline-4">
+<h4 id="orgf8f2f95"><span class="section-number-4">4.4.2.</span> Dynamic bound</h4>
+<div class="outline-text-4" id="text-4-4-2">
+<p>
+While \(\ploc\)  has been  defined to  be independent from  the scheduler  used to
+select the subtree to fetch upon each insertion, the proof of \(\mathbf{D}\) given
+here  heavily  relies  on  the  use   of  the  uniform  scheduler  presented  in
+section <a href="#orga67fc42">3.1.2</a>.  Recall that this scheduler guarantees that at each
+depth \(d\), a node is alternatively selected  with its left and right child.  The
+compaction period of each node at a depth \(d\) is thus \(T(n, d) = \frac{2^d}{n}\),
+where \(n\)  is the number  of branches  selected by the  scheduler and must  be a
+power of two.  The second and more  important consequence is that in the absence
+of congestion, the lifetime of a datum in any given node cannot be more than one
+compaction cycle.   Indeed, if  a datum  is placed in  a given  node at  a given
+compaction, it means the next node on its  target path is the child of this node
+that hasn't  been selected for compaction.   At the next compaction  cycle, that
+child will be selected and this datum  pushed along its target path at least one
+level down.
+</p>
+
+<p>
+With this in mind, consider for once that nodes have an unbounded capacity.  For
+the same reason as  in the static proof, we can consider  the number of bindings
+held by a node at depth \(d < \lg(N)\) to follow a binomial law of parameter \(T(n,
+d)\) and \(p(d+1)\),  where \(p(d) = 2^{-d}\).  Indeed, \(T(n,  d)\) bindings have been
+inserted in the tree since the last  compaction, and a binding targets that node
+if and  only if (unbounded node  capacity) the next  node in its target  path is
+that  node's  child  that  hasn't   been  selected  for  compaction.   During  a
+compaction, we are modifying  at most \(m = n \lg N\) nodes  and we therefore need
+to use a  node capacity \(c(\lambda, n, N)\) guaranteeing  the absence of overflow
+for  that many  nodes  at each  level:  for example,  \(\max_{0 \le  d  < \lg  N}
+k^{\lambda,  n \lg  N}_{T(n, d),  p(d+1)}\).  However,  nodes do  have a  bounded
+capacity and we still need to prove that  no node ever overflows even in face of
+the worst insertion sequence.
+</p>
+
+<p>
+We define an overflowing  path to be an overflowing leaf  or an overflowing node
+which  has at  least  one overflowing  path  among its  children,  and prove  by
+recurrence the  property \((\cP)\): in  a tree of \(N\)  leaves, a node  of capacity
+\(c(N,\lambda)\) that  does not  belong to  an overflowing  path overflows  with a
+probability negligible in \(\lambda\).
+</p>
+<ul class="org-ul">
+<li>\((\cP)\) trivially holds for all leaves.</li>
+<li>Let \(d > 1\) be a depth at which \(\cP\) holds for all nodes.  Upon compaction of
+a node  at depth  \(d-1\), that  node receives a  set of  new bindings  that are
+merged with its current bindings. Without  loss of generality, let's call left
+child the one that has been  selected for compaction.  This child receives all
+the bindings received by its parents that target it:
+<ul class="org-ul">
+<li>If it overflows, since \((\cP)\) holds at  depth \(d\), this child belongs to an
+overflowing path and an overflow of its parent would extend this path.</li>
+<li>If it not overflow, the set of  bindings stored in its parent is exactly the
+set of all old and new bindings  targeting the right child. On the one hand,
+a non-empty set of old bindings  means the right child overflowed during the
+previous compaction.   Since \((\cP)\) holds  at the  depth \(d\) to  which this
+child belongs, it also belongs to an overflowing path that would be extended
+by an overflow of its parent. On the  other hand, if the set of old bindings
+is  empty,  the  node  capacity \(c(N,\lambda)\)  guarantees  the  absence  of
+overflow with overwhelming probability.</li>
+</ul></li>
+</ul>
+<p>
+Therefore,  a tree  overflow  can only  happen  if the  root is  the  tip of  an
+overflowing path  to some leaf.  In  particular, if the leaves  cannot overflow,
+the tree cannot overflow.  We could  choose the leaf capacity to be \(k^{\lambda,
+N}_{N, N^{-1}}\) to guarantee \(\bD\).  It would however unnecessarily increase the
+tree size  (we achieved to  prove \(\bS\) for smaller  leaf sizes) and  we instead
+prove  that, given  nodes of  capacity \(c^*\),  there exists  \(d^*\) such  that no
+subtree of depth \(d^*\) which leaves are leaves of the main tree can overflow. In
+particular, both  \(\bS\) and \(\bD\) need  to hold for those  subtrees.  \(c^*\) must
+therefore be the  maximum of the capacities required for  each property to hold:
+\(c^* = \max(c^*_s, c^*_d)\).
+</p>
+
+<p>
+In what follows, we  prove that there exists a depth \(d^*\)  such that the number
+\(2^i B^*\)  of bindings arriving  in any subtree of  depth \(d^*\) during  the time
+required  to  compact  \(i\)  levels  is  smaller  than  \(i  c^*\),  where  \(B^*  =
+T(n, d_{\max} - d^*)\), \(p^* = p(d_{\max} - d^*)\) and \(c^* = k^{\lambda, m}_{B^*,
+p^*}\).   By  definition,  we  have  for   each  \(k  >  k^{\lambda,  m}_{B,  p}\):
+\[m\left(\frac{e  \mu}{k} \right)^{k}  \le  2^{-\lambda}\]  and considering  the
+equality  case:  \[k  \left(\ln(k)  -  \ln(\mu) -  1\right)  =  \lambda\ln(2)  +
+\lg(m).\] Supposing \(k\) is a continuous function in \(i\) and \(\mu = 2^i B^*\), and
+taking the partial derivative with respect to \(i\) of both sides we have:
+</p>
+<p>
+Therefore,
+</p>
+<p>
+Noting  \(k^*\) the  biggest integer  \(k\) verifying  that inequality,  and \(d^*  =
+\frac{k^*}{c^*}\), we  have for  each \(i \le  d^*, k(i) \le  i c^*\)  which proves
+\(\bD\) in any subtree  of depth \(d^*\). Proving \(\bS\) in that  subtree can be done
+by modifying  the proof given in  section <a href="#org519d4c7">4.4.1</a> in order  to extract the
+first overflowing  depth and ensuring  it is bigger  than \(d_{\max} -  d^*\). The
+following         table          <a href="#orgc8582ff">2</a>         and
+<a href="#orgdc69fc3">3</a> give  some values of the  node capacity \(c^*\)
+for which both \(\bS\) and \(\bD\) hold for some values of \(\lambda\), \(n\) and \(N\):
+</p>
+
+<table id="orgc8582ff" border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<caption class="t-above"><span class="table-number">Table 2:</span> \(c^*(\lambda, n, N)\) in function of \(n\) and \(\lg(N)\) for \(\lambda = 128\).</caption>
+
+<colgroup>
+<col  class="org-right" />
+</colgroup>
+
+<colgroup>
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-right">\(n\)</th>
+<th scope="col" class="org-right">&#xa0;</th>
+<th scope="col" class="org-right">\(\lg(N)\)</th>
+<th scope="col" class="org-right">&#xa0;</th>
+</tr>
+
+<tr>
+<th scope="col" class="org-right">&#xa0;</th>
+<th scope="col" class="org-right">16</th>
+<th scope="col" class="org-right">32</th>
+<th scope="col" class="org-right">40</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-right">16</td>
+<td class="org-right">19</td>
+<td class="org-right">19</td>
+<td class="org-right">19</td>
+</tr>
+
+<tr>
+<td class="org-right">32</td>
+<td class="org-right">17</td>
+<td class="org-right">17</td>
+<td class="org-right">17</td>
+</tr>
+
+<tr>
+<td class="org-right">64</td>
+<td class="org-right">16</td>
+<td class="org-right">16</td>
+<td class="org-right">16</td>
+</tr>
+
+<tr>
+<td class="org-right">128</td>
+<td class="org-right">14</td>
+<td class="org-right">14</td>
+<td class="org-right">14</td>
+</tr>
+
+<tr>
+<td class="org-right">256</td>
+<td class="org-right">13</td>
+<td class="org-right">13</td>
+<td class="org-right">13</td>
+</tr>
+</tbody>
+</table>
+
+<table id="orgdc69fc3" border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<caption class="t-above"><span class="table-number">Table 3:</span> \(c^*(\lambda, n, N)\) in function of \(n\) and \(\lg(N)\) for \(\lambda = 64\).</caption>
+
+<colgroup>
+<col  class="org-right" />
+</colgroup>
+
+<colgroup>
+<col  class="org-right" />
+
+<col  class="org-right" />
+
+<col  class="org-right" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-right">\(n\)</th>
+<th scope="col" class="org-right">&#xa0;</th>
+<th scope="col" class="org-right">\(\lg(N)\)</th>
+<th scope="col" class="org-right">&#xa0;</th>
+</tr>
+
+<tr>
+<th scope="col" class="org-right">&#xa0;</th>
+<th scope="col" class="org-right">16</th>
+<th scope="col" class="org-right">32</th>
+<th scope="col" class="org-right">40</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-right">16</td>
+<td class="org-right">11</td>
+<td class="org-right">11</td>
+<td class="org-right">11</td>
+</tr>
+
+<tr>
+<td class="org-right">32</td>
+<td class="org-right">10</td>
+<td class="org-right">10</td>
+<td class="org-right">10</td>
+</tr>
+
+<tr>
+<td class="org-right">64</td>
+<td class="org-right">9</td>
+<td class="org-right">9</td>
+<td class="org-right">9</td>
+</tr>
+
+<tr>
+<td class="org-right">128</td>
+<td class="org-right">8</td>
+<td class="org-right">8</td>
+<td class="org-right">8</td>
+</tr>
+
+<tr>
+<td class="org-right">256</td>
+<td class="org-right">7</td>
+<td class="org-right">8</td>
+<td class="org-right">8</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div id="outline-container-org5ff4522" class="outline-3">
+<h3 id="org5ff4522"><span class="section-number-3">4.5.</span> \(\ploc\) simulator</h3>
+<div class="outline-text-3" id="text-4-5">
+<p>
+Given <code>phi</code>, the simulator of the tree scheme, we can now build the simulator of
+the client-side  \(\ploc\) scheme. We  have proven  in the previous  sections that
+this  simulator is  indistinguishable from  a legitimate  client. Since  it only
+requires the name of the operation to  perform and some indexing function of the
+label upon search, this proves that \(\ploc\) is injection-secure.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #1054AF; font-weight: bold;">define-module</span> (<span style="color: #444444; font-weight: bold;">sse ploc simulator</span>)
+  <span style="color: #444444;">#:use-module</span> (sse utils)
+  <span style="color: #444444;">#:use-module</span> (sse ploc scheduler))
+
+(<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">make-psi</span> pp-tree c n N V value-size PRF make-phi)
+
+  (<span style="color: #1054AF; font-weight: bold;">define</span> <span style="color: #444444;">phi</span> (make-phi pp-tree (* c value-size) (lg N)))
+
+  (<span style="color: #1054AF; font-weight: bold;">define</span> <span style="color: #444444;">scheduler</span> (make-scheduler n))
+
+  (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">psi-setup</span>) (phi 'setup))
+
+  (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">psi-search</span> label-idx)
+    (<span style="color: #1054AF; font-weight: bold;">let*</span> ((targets (<span style="color: #1054AF; font-weight: bold;">map</span> (<span style="color: #1054AF; font-weight: bold;">&#955;</span> (v) (PRF label-idx v)) (iota V)))
+           (subtree (phi 'fetch targets)))
+      (values)))
+
+  (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">psi-insert</span>)
+    (<span style="color: #1054AF; font-weight: bold;">let</span> ((targets (scheduler)))
+      (phi 'fetch targets)
+      (phi 'merge targets)))
+
+  (<span style="color: #1054AF; font-weight: bold;">&#955;</span> (op . args)
+    (<span style="color: #1054AF; font-weight: bold;">match</span> op
+      ('setup  (apply psi-setup  args))
+      ('search (apply psi-search args))
+      ('insert (apply psi-insert args)))))
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="outline-container-org56b26a1" class="outline-2">
+<h2 id="org56b26a1"><span class="section-number-2">5.</span> Performance analysis and variations on \(\ploc\)</h2>
+<div class="outline-text-2" id="text-5">
+<div class="theorem" id="orgc6f101e">
+<p>
+When  instantiated using  a  \((c  \lg \bbV,  B)\)-tree  encryption scheme  with
+\(O(|\{b_i\}| \times c \lg \bbV \lg B)\) \(\Fetch\) and \(\Merge\) operations, \(\ploc\)
+is  an   \((\bbL,\bbV)\)-multi-map  encryption   scheme  with   two-round  \(O((c
+\lg  |\bbV|  +  C_1)  n  \lg   B)\)  \(\Insert\)  operations  and  one-round  \(O((c
+\lg |\bbV| + C_2) V \lg B)\) \(\Search\) operations.
+</p>
+
+</div>
+
+<div class="proof" id="org47bc39b">
+<p>
+The  number  of  rounds  can  be  enumerated from  the  code  of  the  reference
+implementation described in  section <a href="#org63ce6ee">3</a>.  In the case  of an \(\Insert\)
+operation, a  subtree of \(n\)  leaves is successively fetched,  modified locally,
+then  merged  back to  the  main  tree.  Since  the  tree  encryption scheme  is
+instantiated with  \(s = c \lg  |\bbV|\) and \(D =  \lg N\), the complexity  of both
+tree operations is \(O(c \lg |\bbV| \times  n \lg N)\). The compaction of the tree
+being linear in its  size, its complexity is in \(O(n \lg N)\).   In the case of a
+\(\Search\) operation,  a single tree  \(\Fetch\) is performed  on a subtree  of \(V\)
+leaves, which gives the desired complexity.
+</p>
+
+</div>
+
+<p>
+Theorem <a href="#orgc6f101e">No description for this link</a>  guarantees  logarithmic  performances  in  \(N\)  for
+\(\ploc\), although with a non-negligible constant.  In practice, the performances
+of the  reference implementation given  here &#x2013;  which is optimized  for clarity
+rather then speed &#x2013;  are good: on an Intel(R) Core(TM)  i5-6200U CPU @ 2.30GHz,
+we can measure the following timings using GNU Guile v3.10:
+</p>
+
+<table id="org096d6aa" border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<caption class="t-above"><span class="table-number">Table 4:</span> Operation performances (\(\Search \quad \Insert\)) in function of \(n\) and \(N\) for \(V = \sqrt{B}\) and \(c\) given in Table <a href="#orgc8582ff">2</a>.</caption>
+
+<colgroup>
+<col  class="org-left" />
+</colgroup>
+
+<colgroup>
+<col  class="org-left" />
+
+<col  class="org-left" />
+
+<col  class="org-left" />
+</colgroup>
+<thead>
+<tr>
+<th scope="col" class="org-left">\(n\) \\ \(B\)</th>
+<th scope="col" class="org-left">\(2^{10}\)</th>
+<th scope="col" class="org-left">\(2^{16}\)</th>
+<th scope="col" class="org-left">\(2^{20}\)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="org-left">\(16\)</td>
+<td class="org-left">\(2.1\msec \quad 1.8\msec\)</td>
+<td class="org-left">\(26\msec \quad 3.1\msec\)</td>
+<td class="org-left">\(0.17\sec \quad 3.8\msec\)</td>
+</tr>
+
+<tr>
+<td class="org-left">\(64\)</td>
+<td class="org-left">\(2.1\msec \quad 5.4\msec\)</td>
+<td class="org-left">\(25\msec \quad 11\msec\)</td>
+<td class="org-left">\(0.12\sec \quad 13\msec\)</td>
+</tr>
+
+<tr>
+<td class="org-left">\(256\)</td>
+<td class="org-left">\(2.0\msec \quad 18\msec\)</td>
+<td class="org-left">\(25\msec \quad 34\msec\)</td>
+<td class="org-left">\(0.12\sec \quad 45\msec\)</td>
+</tr>
+</tbody>
+</table>
+
+<p>
+Note  that increasing  \(n\) allows  decreasing \(c\),  but it  does not  impact the
+\(\Search\)   timings   much   since   nodes    are   mostly   padding   and   the
+\(\ploc\)-operation  constant is  much bigger  than the  tree-operation constant
+(\(C_2 \gg 1\)). The \(\Search\) timings are  mostly impacted by \(V\) which is linked
+to \(B\) in the present benchmark.
+</p>
+</div>
+<div id="outline-container-orgf80a40b" class="outline-3">
+<h3 id="orgf80a40b"><span class="section-number-3">5.1.</span> Fully-dynamic multi-map encryption scheme</h3>
+<div class="outline-text-3" id="text-5-1">
+<p>
+The  scheme  described  in  section <a href="#org63ce6ee">3</a>  only  supports  \(\Insert\)  and
+\(\Search\) queries. However, the possibility to delete bindings is usually needed
+by concrete  use-cases.  It  is actually possible  to implement  a fully-dynamic
+multi-map  encryption scheme  on  top  of \(\ploc\)  with  the  same security  and
+performance characteristics using a classic  technique known as <i>lazy deletions</i>
+that  we  find more  appropriate  to  call  <i>journaling</i>: instead  of  inserting
+bindings in  a multi-map, we use  this multi-map to store  per-label log entries
+containing  arbitrary  operations.   This   technique  allows  implementing  any
+associative abstract data type.
+</p>
+
+<div class="definition" id="org785f9fa">
+<p>
+An associative abstract data type (or mapping) is an abstract data type:
+</p>
+<ul class="org-ul">
+<li>supporting a valid empty state;</li>
+<li>supporting an  operation \(\Search\)  parameterized by  an argument  type called
+labeling domain, noted \(\bbL\), which sole  purpose is to retrieve the value(s)
+currently indexed under a given label \(\ell\);</li>
+<li>of which all  other operations are parameterized by a  composite argument type
+\(\bbA = \bbL \times \bbA'\) and the result type \(\bbR = \{\bot\}\), and have for
+sole purpose to mutate the value(s) indexed under some label \(\ell\).</li>
+</ul>
+
+</div>
+
+<div class="remark" id="orgb6c2e07">
+<p>
+A multi-map is a mapping for which \(\bbA' = \bbV\) and the parametric result type
+for the search operation is \(\bbV^* = (\bot \cup \bbV) \times \bbV^*\).
+</p>
+
+</div>
+
+<p>
+Logging a mapping operation is as simple as inserting the operation name and its
+rest arguments (in \(\bbA'\)) under the targeted label:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">encrypted-mapping-mutate</span> key op label args)
+  (ploc-insert key label (list op args)))
+</pre>
+</div>
+<p>
+Note that mapping mutations &#x2013; once  specialized with their arguments &#x2013; consume
+and return  a mapping data structure  and therefore form a  monoid which neutral
+element is the identity. This property allows  us to reduce the log entries to a
+unique  mapping transformation  that can  then be  used to  produce the  current
+mapping state by applying it to the empty state:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">specialize</span> entry)
+  (<span style="color: #1054AF; font-weight: bold;">let</span> ((op   (head entry))
+        (args (tail entry)))
+    (op label args mapping)))
+
+(<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">encrypted-mapping-search</span> key label)
+  (<span style="color: #1054AF; font-weight: bold;">let*</span> ((log (ploc-search key label))
+         (ops (<span style="color: #1054AF; font-weight: bold;">map</span> specialize log))
+         (tx  (reduce compose identity ops)))
+    (mapping-search label (tx empty-mapping))))
+</pre>
+</div>
+
+<div class="corollary" id="orgb37b9d6">
+<p>
+There exists an injection-secure  fully-dynamic multi-map encryption scheme with
+the same performance characteristics as \(\ploc\).
+</p>
+
+</div>
+
+<div class="proof" id="orgf64d863">
+<p>
+Direct using the journaling transformation proposed above.
+</p>
+
+</div>
+
+<div class="remark" id="org1babc66">
+<p>
+This  transformation  allows   implementing  an  injection-secure  fully-dynamic
+multi-map encryption scheme, but does not allow reclaiming the space used by the
+deleted  bindings. To  that end,  we need  to add  a special  garbage-collection
+primitive to \(\ploc\) that reads the  subtree targeted by a given label, extracts
+the  values bound  to this  label, filters  out the  deleted ones,  compacts the
+subtree with  the remaining bindings, merges  the subtree back to  the main tree
+and returns  the remaining  values to  the client.   Like the  search operation,
+garbage collection  only leaks  the permuted  label index  and can  therefore be
+executed few  such operations instead  of the search,  in order to  amortize the
+cost of its additional round-trip.
+</p>
+
+</div>
+</div>
+</div>
+<div id="outline-container-org609011d" class="outline-3">
+<h3 id="org609011d"><span class="section-number-3">5.2.</span> Stateless insertions</h3>
+<div class="outline-text-3" id="text-5-2">
+<div class="corollary" id="orgcce07ba">
+<p>
+There exists an injection-secure  fully-dynamic multi-map encryption scheme with
+stateless client,  four-round \(O((c \lg  |\bbV| +  C_1) n \lg  B + C_1'  \lg L)\)
+\(\Insert\) operations, where  \(L\) is an upper-bound on the  number of labels, and
+\(O((c \lg |\bbV| + C_2) V \lg B)\) non-interactive \(\Search\) operations.
+</p>
+
+</div>
+
+<p>
+<i>Informal proof</i>: It is  possible to get a stateless ORAM  client by storing the
+padded        stash         server-side,        for         example        using
+PathORAM \autocite{10.1145/3177872}. When using it to  store the label volumes, the
+costs a querying a  label is \(O(\lg L)\). The protocol  for performing a mutation
+would be:
+</p>
+<ol class="org-ol">
+<li>retrieve the stash from the server: \(O(\lg L)\);</li>
+<li>read the ORAM in search for the volume of the mutated label: \(O(\lg L)\);</li>
+<li>perform the \(\ploc\) mutation \(O((c \lg |\bbV| + C_1) n \lg B)\);</li>
+<li>write back the updated stash and ORAM data structure: \(O(\log L)\).</li>
+</ol>
+<p>
+Since  both the  ORAM and  the \(\ploc\)  mutation have  no non-trivial  leakages,
+accomplishing these four steps only has trivial leakage, which allows preserving
+\(\ploc\)'s injection security.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org7a85e58" class="outline-2">
+<h2 id="org7a85e58"><span class="section-number-2">6.</span> Conclusion and future work</h2>
+<div class="outline-text-2" id="text-6">
+<p>
+In this article, we have presented \(\ploc\), a new SSE scheme, and proved that it
+is  injection-secure.  Doing  so,  we achieved  state-of-the-art security  while
+significantly improving upon the only other injection-secure SSE scheme known to
+date.   Our proof  of injection  security  relies on  a new  way to  decorrelate
+mutations from their effect: we rely on  the root being a member of all branches
+to push store  values in the path  to their target leaf without  having to fetch
+branches derived  from those values nor  their indexing label.  Central  to this
+proof  is the  fact that  compaction  does not  overflow.   To the  best of  our
+knowledge, there has been  no study of such mechanism and  we therefore give the
+first bound on the node capacity  allowing to prevent overflow with overwhelming
+probability.  In  a future work,  we would like to  see that bound  tightened in
+order to improve the concrete performance of our scheme.
+</p>
+
+<p>
+The stateless nature of \(\ploc\)'s  search operations makes it trivially amenable
+to  a single-writer,  multi-reader  setting without  loosing  any security.   We
+believe  it also  amenable to  the fully-concurrent  setting, which  would be  a
+break-through as  the only fully concurrent  scheme known to date  does not even
+guarantee  forward  security  in  all  cases. In  order  to  achieve  this,  the
+client-side counters (only  required for insertion) needs to  be synchronized or
+removed.   One way  to remove  it would  be to  prove that  there exists  a node
+capacity such  that inserting values targeting  a random branch from  the target
+set of their indexing label does not cause the tree to overflow.
+</p>
+
+<p>
+Finally, we  believe that \(\ploc\)  has the potential  to bridge the  gap between
+security and real-world applications with stringent performance requirements. We
+therefore hope to see used in many applications.
+</p>
+</div>
+</div>
+<div id="outline-container-orgbe6a060" class="outline-2">
+<h2 id="orgbe6a060"><span class="section-number-2">7.</span> Acknowledgments</h2>
+<div class="outline-text-2" id="text-7">
+<p>
+The authors  would like to thank  David Pointcheval for his  invaluable feedback
+and  the  numerous  and  insightful  shared  discussions,  Cosmian  for  funding
+long-term research and the Cosmian security team for their support.
+</p>
+
+\printbibliography
+</div>
+</div>
+<div id="outline-container-org59a5424" class="outline-2">
+<h2 id="org59a5424"><span class="section-number-2">8.</span> Reflection on the making of this article</h2>
+<div class="outline-text-2" id="text-8">
+<p>
+Besides proposing a novel and powerful SSE scheme, this article also innovates
+on the way it has been produced, which we discuss in the following sections. We
+hope this can inspire other cryptographers and that the practices adopted here
+become more widespread in the future.
+</p>
+</div>
+<div id="outline-container-org98a1905" class="outline-3">
+<h3 id="org98a1905"><span class="section-number-3">8.1.</span> Literate programming</h3>
+<div class="outline-text-3" id="text-8-1">
+<p>
+Literate programming is an implementation technique pioneered by Donald Knuth.
+It inverts the usual paradigm by inserting fragments of code in a text document
+instead of inserting fragments of documentation in the source files. The aim is
+to expose the code in an order that better fits the prose. Code fragments are
+then extracted and <i>tangled</i> back together by a dedicated software in order to
+produce the source files required by the compiler.
+</p>
+
+<p>
+This article has been written in Org &#x2013; an expressive markup language &#x2013; with
+Emacs' Org Mode which provides a way to both tangle code fragments and to export
+a document containing source code to different back-ends like \LaTeX{} or
+HTML. That way the <code>.org</code> file is self-sufficient, which helps to make the
+article reproducible.
+</p>
+</div>
+</div>
+<div id="outline-container-org749529b" class="outline-3">
+<h3 id="org749529b"><span class="section-number-3">8.2.</span> Using <del>pseudo</del> code</h3>
+<div class="outline-text-3" id="text-8-2">
+<p>
+Rather than exposing our algorithm using some pseudo-code flavor, we chose to
+directly expose its implementation in a programming language to inherit from a
+well-defined &#x2013; here standardized &#x2013; semantics. Three things helped to achieve
+that: literate programming to make it possible, Emacs' Org Mode which made it
+easy and the Scheme programming language which allows expressing complex
+algorithms in few lines.
+</p>
+</div>
+</div>
+<div id="outline-container-orge1f0d5d" class="outline-3">
+<h3 id="orge1f0d5d"><span class="section-number-3">8.3.</span> A path to formal verification</h3>
+<div class="outline-text-3" id="text-8-3">
+<p>
+Apart from unambiguousness, using a programming language to present the
+algorithm and deriving a simulator has direct, very desirable side-effects:
+</p>
+<ul class="org-ul">
+<li>it allows compiling and testing the very algorithm described in the paper to
+verify it is valid, exhaustive and to test it performs as intended;</li>
+<li>it provides a reference implementation which is explained in great details;</li>
+<li>it simplifies the review process of our proofs since we used code diffs to
+highlight the changes. These diffs are automatically generated, allowing
+readers to fully trust them: there is no hidden, unexplained additional change
+in-between code transformations;</li>
+<li>it allows running the simulator given in section <a href="#org5ff4522">4.5</a> against the
+reference implementation to test their indistinguishability.</li>
+</ul>
+<p>
+This approach opens a way in-between publishing without verified source code and
+publishing automated verification of a source code, which often makes up for a
+paper in itself: our implementation is formally verified, but this verification
+is not automated and relies on careful reviews of our proof and the
+indistinguishability tests of our reference implementation.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orgacfda51" class="outline-2">
+<h2 id="orgacfda51"><span class="section-number-2">9.</span> A Scheme primer</h2>
+<div class="outline-text-2" id="text-9">
+<p>
+Scheme is a functionally-oriented programming language which simple syntax and
+expressiveness make it a target of choice to express algorithms. In this
+section, we provide the basics required for readers that are not familiar with
+this language to understand the \(\ploc\) implementation described in this
+article. For a complete reference, see \autocite{10.5555/1618542}.
+</p>
+</div>
+<div id="outline-container-orgea77194" class="outline-3">
+<h3 id="orgea77194"><span class="section-number-3">9.1.</span> Functions</h3>
+<div class="outline-text-3" id="text-9-1">
+<p>
+Scheme implements the untyped lambda calculus, which defines the following
+operations:
+</p>
+<ul class="org-ul">
+<li><code>(λx.y)</code> (abstraction) is the function with formal parameter <code>x</code> and body <code>y</code>;</li>
+<li><code>(M N)</code> (application) evaluates the function <code>M</code> with the value <code>N</code> as
+parameter;</li>
+</ul>
+<p>
+Similarly, a Scheme function is declared using the \(\lambda\) operator:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #1054AF; font-weight: bold;">&#955;</span> (arg ...) body ...)
+</pre>
+</div>
+<p>
+in which the formal arguments <code>arg</code> are bound to values upon application using
+the syntax:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">((<span style="color: #1054AF; font-weight: bold;">&#955;</span> (arg ...) body ...) val ...)
+</pre>
+</div>
+<p>
+For example, <code>((λ (x y) (+ x y))  1 2)</code> evaluates to 3. The main difference here
+between Scheme and the lambda calculus is that Scheme supports the definition of
+functions of multiple  arguments while the untyped lambda calculus  does not and
+that Scheme functions support returning multiple values using <code>values</code>.
+</p>
+</div>
+</div>
+<div id="outline-container-org20eea6c" class="outline-3">
+<h3 id="org20eea6c"><span class="section-number-3">9.2.</span> Bindings</h3>
+<div class="outline-text-3" id="text-9-2">
+<p>
+Departing from the lambda calculus, Scheme supports binding names to values. For
+historical reasons, there are many bindings operators:
+</p>
+<ul class="org-ul">
+<li><code>(define name value)</code> binds <code>name</code> to <code>value</code> in the enclosing scope;</li>
+<li><code>(define-values (name ...) values)</code> same as <code>define</code> but is used to bind
+values produced by <code>values</code>.</li>
+<li><code>(let ((name value) ...) body ...)</code> generates a new scope in which the given
+names are bound to the given values, and in which the body is evaluated;</li>
+<li><code>(let* ((name value) ...) body ...)</code> same as <code>let</code> but each binding in the
+scope of the following one;</li>
+<li><code>(let-values (((name ...) values) ...) body ...)</code> same as <code>let</code> but is used to
+bind values produced by <code>values</code>;</li>
+<li><code>(let*-values (((name ...) values) ...) body ...)</code> same as <code>let*</code> but is used
+to bind values produced by <code>values</code>.</li>
+</ul>
+<p>
+For example, a function can be named using <code>define</code>:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #1054AF; font-weight: bold;">define</span> <span style="color: #444444;">add</span> (<span style="color: #1054AF; font-weight: bold;">&#955;</span> (x y) (+ x y)))
+</pre>
+</div>
+<p>
+which has an equivalent syntactic sugar:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">add</span> x y) (+ x y))
+</pre>
+</div>
+<p>
+And any symbol can be rebound using <code>set!</code>:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #1054AF; font-weight: bold;">set!</span> add (<span style="color: #1054AF; font-weight: bold;">&#955;</span> (x y z) (+ x y z)))
+</pre>
+</div>
+<p>
+A binding  syntax of particular  interest call  named let, allows  combining the
+definition of a recursive function and  its initial call:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #1054AF; font-weight: bold;">let</span> <span style="color: #444444;">name</span> ((arg init) ...)
+  body ...)
+</pre>
+</div>
+<p>
+is equivalent to:
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #1054AF; font-weight: bold;">letrec</span>  ((name (<span style="color: #1054AF; font-weight: bold;">&#955;</span> (arg ...) body ...)))
+  (name init ...))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org6c4fb77" class="outline-3">
+<h3 id="org6c4fb77"><span class="section-number-3">9.3.</span> Types</h3>
+<div class="outline-text-3" id="text-9-3">
+<p>
+Although  modeled  after  the  untyped  lambda  calculus,  type  information  is
+available at runtime.  There are mainly four data-types in  use in this article:
+boolean values, numbers, lists and vectors:
+</p>
+<ul class="org-ul">
+<li>boolean values are either <code>#t</code> (true) or <code>#f</code> (false). They support the usual
+boolean operators <code>and</code> and <code>or</code> and are used for control flow. For example,
+<code>(if boolean body1 body2)</code> evaluates to <code>body1</code> if <code>boolean</code> is <code>#t</code> and
+<code>body2</code> otherwise.</li>
+<li>numbers can be are arbitrary large and support all the usual operations like
+<code>+</code> and <code>modulo</code>;</li>
+<li>lists are generated using <code>(list value ...)</code> and support dynamic resizing via
+prepending with <code>(cons value lst)</code> which returns a list starting with <code>value</code>
+and ending with the same elements as <code>lst</code>, and appending via <code>(append lst
+  ...)</code> which returns a list starting with the elements in <code>lst</code> and ending with
+the elements of the subsequent lists.</li>
+<li>vectors are generated using <code>(vector value ...)</code> and do not support dynamic
+resizing.</li>
+</ul>
+<p>
+List elements are accessed using <code>(list-ref lst index)</code> and vector elements are
+indexed using <code>(vector-ref vec index)</code>.
+</p>
+
+<p>
+Scheme supports pattern matching using <code>(match value (pattern body) ...)</code> in
+which the body evaluated is the one associated to the first matching
+pattern. These patterns can be:
+</p>
+<ul class="org-ul">
+<li>any boolean or number, matching this value;</li>
+<li><code>()</code> matching a list of no element;</li>
+<li><code>(head . tail)</code> matching a list of at least one element with first element
+<code>head</code> and remaining element list <code>tail</code>, in which case <code>body</code> is evaluated
+with <code>head</code> and <code>tail</code> in scope;</li>
+<li><code>#(element ...)</code> matching a vector containing the given number of elements, in
+which case <code>body</code> is evaluated with these elements in scope.</li>
+</ul>
+
+<p>
+For example, the  following piece of code taken from  the \(\ploc\) implementation
+defines  a function  named <code>split-with</code>  that takes  two arguments:  a predicate
+<code>pred?</code> and a list  <code>xs</code>. It deconstructs <code>xs</code> until it is  reduced to the empty
+list, successively prepending  each deconstructed element from <code>xs</code>  to <code>lsh</code> if
+this  element matches  the predicate  <code>pred?</code>  or <code>rhs</code>  otherwise. Finally,  it
+returns both <code>lhs</code> and <code>rhs</code>.
+</p>
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">split-with</span> pred? xs)
+  (<span style="color: #1054AF; font-weight: bold;">let</span> <span style="color: #444444;">loop</span> ((xs xs) (lhs (list)) (rhs (list)))
+    (<span style="color: #1054AF; font-weight: bold;">match</span> xs
+      ((x . xs) (<span style="color: #1054AF; font-weight: bold;">if</span> (pred? x)
+                    (loop xs (cons x lhs) rhs)
+                    (loop xs lhs (cons x rhs))))
+      (()       (values lhs rhs)))))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgbf4495b" class="outline-3">
+<h3 id="orgbf4495b"><span class="section-number-3">9.4.</span> Classical procedures</h3>
+<div class="outline-text-3" id="text-9-4">
+<p>
+The \(\ploc\) implementation also makes use of the classical procedures:
+</p>
+<ul class="org-ul">
+<li><code>(iota n)</code> which returns the list <code>(0 1 ... (- n 1))</code>;</li>
+<li><code>(foldl f a xs)</code> which accumulates each element of <code>xs</code> using <code>(f a x)</code> then
+returns <code>a</code>;</li>
+<li><code>(map f xs)</code> which returns the list of all values in <code>xs</code> transformed using
+<code>(f x)</code>;</li>
+<li><code>(filter pred? xs)</code> which returns the list of all values in <code>xs</code> matching the
+predicate function <code>pred?</code>.</li>
+</ul>
+</div>
+</div>
+</div>
+<div id="outline-container-org238a999" class="outline-2">
+<h2 id="org238a999"><span class="section-number-2">10.</span> Reference implementation</h2>
+<div class="outline-text-2" id="text-10">
+</div>
+<div id="outline-container-orgbcc061f" class="outline-3">
+<h3 id="orgbcc061f"><span class="section-number-3">10.1.</span> Useful functions</h3>
+<div class="outline-text-3" id="text-10-1">
+<p>
+We first define some additional wrappers, utility functions and data-structures.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #1054AF; font-weight: bold;">library</span> (<span style="color: #444444; font-weight: bold;">sse</span> utils)
+  (<span style="color: #1054AF; font-weight: bold;">export</span> &#955; lg &lt;&lt; &gt;&gt; &amp;&amp; u8? u64? iota foldl split-with take match
+          make-hmap hmap-find hmap-bind!
+          make-hset hset-has? hset-add!  hset-&gt;list)
+  (<span style="color: #1054AF; font-weight: bold;">import</span> (rnrs base)
+          (rnrs control)
+          (rnrs lists)
+          (rnrs hashtables)
+          (rnrs arithmetic bitwise)
+          (<span style="color: #1054AF; font-weight: bold;">only</span> (ice-9 match) match)
+          (<span style="color: #1054AF; font-weight: bold;">only</span> (srfi <span style="color: #444444;">:1</span>) iota))
+
+  (<span style="color: #1054AF; font-weight: bold;">define-syntax</span> <span style="color: #444444;">&#955;</span>
+    (<span style="color: #1054AF; font-weight: bold;">syntax-rules</span> ()
+      ((_ expr ...) (<span style="color: #1054AF; font-weight: bold;">lambda</span> expr ...))))
+
+  (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">u8?</span> n)
+    (<span style="color: #1054AF; font-weight: bold;">and</span> (integer? n)
+         (&lt;= 0 n) (&lt; n (&lt;&lt; 1 8))))
+
+  (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">u64?</span> n)
+    (<span style="color: #1054AF; font-weight: bold;">and</span> (integer? n)
+         (&lt;= 0 n) (&lt; n (&lt;&lt; 1 64))))
+
+  (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">lg</span> n) (/ (log n) (log 2)))
+
+  (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">&lt;&lt;</span> n e) (bitwise-arithmetic-shift-left  n e))
+  (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">&gt;&gt;</span> n e) (bitwise-arithmetic-shift-right n e))
+  (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">&amp;&amp;</span> n m) (bitwise-and n m))
+
+  (<span style="color: #1054AF; font-weight: bold;">define</span> <span style="color: #444444;">head</span> car)
+  (<span style="color: #1054AF; font-weight: bold;">define</span> <span style="color: #444444;">tail</span> cdr)
+
+  (<span style="color: #1054AF; font-weight: bold;">define</span> <span style="color: #444444;">foldl</span> fold-left)
+
+  (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">take</span> n lst)
+    (<span style="color: #1054AF; font-weight: bold;">let</span> <span style="color: #444444;">loop</span> ((n n) (pfx (list)) (lst lst))
+      (<span style="color: #1054AF; font-weight: bold;">if</span> (<span style="color: #1054AF; font-weight: bold;">or</span> (zero? n) (null? lst))
+          (values pfx lst)
+          (loop (- n 1) (cons (head lst) pfx) (tail lst)))))
+
+  (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">split-with</span> pred? xs)
+    (<span style="color: #1054AF; font-weight: bold;">let</span> <span style="color: #444444;">loop</span> ((xs xs) (lhs (list)) (rhs (list)))
+      (<span style="color: #1054AF; font-weight: bold;">if</span> (pair? xs)
+          (<span style="color: #1054AF; font-weight: bold;">if</span> (pred? (head xs))
+              (loop (tail xs) (cons (head xs) lhs) rhs)
+              (loop (tail xs) lhs (cons (head xs) rhs)))
+          (values lhs rhs))))
+
+  (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">make-hmap</span>)           (make-hashtable equal-hash equal?))
+  (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">hmap-find</span>  hmap k d) (hashtable-ref hmap k d))
+  (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">hmap-bind!</span> hmap k v) (<span style="color: #1054AF; font-weight: bold;">begin</span> (hashtable-set! hmap k v) hmap))
+
+  (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">make-hset</span>)        (make-hashtable equal-hash equal?))
+  (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">hset-has?</span> hset v) (hashtable-ref hset v #f))
+  (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">hset-add!</span> hset v) (<span style="color: #1054AF; font-weight: bold;">begin</span> (hashtable-set! hset v #t) hset))
+  (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">hset-&gt;list</span> hset)  (vector-&gt;list (hashtable-keys hset))))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgb6a4253" class="outline-3">
+<h3 id="orgb6a4253"><span class="section-number-3">10.2.</span> Serialization</h3>
+<div class="outline-text-3" id="text-10-2">
+<p>
+We then define some wrappers on the standard functions to be able to easily
+serialize numbers and bytes.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #1054AF; font-weight: bold;">library</span> (<span style="color: #444444; font-weight: bold;">sse</span> serialization)
+  (<span style="color: #1054AF; font-weight: bold;">export</span> make-bytevector
+          bytevector?
+          bytevector-length
+          string-&gt;utf8
+          write-u8!    read-u8
+          write-u16!   read-u16
+          write-u32!   read-u32
+          write-u64!   read-u64
+          write-u128!  read-u128
+          write-bytes! read-bytes)
+  (<span style="color: #1054AF; font-weight: bold;">import</span> (sse utils)
+          (rnrs base)
+          (rnrs control)
+          (rnrs bytevectors)
+          (rnrs arithmetic bitwise))
+
+  (<span style="color: #1054AF; font-weight: bold;">define</span> <span style="color: #444444;">endianess%</span> (endianness big))
+
+  (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">write-u8!</span> bytes pos val)
+    (bytevector-u8-set! bytes pos val)
+    (+ pos 1))
+
+  (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">write-u16!</span> bytes pos val)
+    (bytevector-u16-set! bytes pos val endianess%)
+    (+ pos 2))
+
+  (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">write-u32!</span> bytes pos val)
+    (bytevector-u32-set! bytes pos val endianess%)
+    (+ pos 4))
+
+  (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">write-u64!</span> bytes pos val)
+    (bytevector-u64-set! bytes pos val endianess%)
+    (+ pos 8))
+
+  (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">write-u128!</span> bytes pos val)
+    (<span style="color: #1054AF; font-weight: bold;">let</span> ((v1 (&gt;&gt; val 64))
+          (v2 (&amp;&amp; val (- (&lt;&lt; 1 64) 1))))
+      (write-u64! bytes (+ pos 0) v1)
+      (write-u64! bytes (+ pos 8) v2)
+      (+ pos 16)))
+
+  (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">read-u8</span> bytes pos)
+    (values (bytevector-u8-ref bytes pos)
+            (+ pos 1)))
+
+  (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">read-u16</span> bytes pos)
+    (values (bytevector-u16-ref bytes pos endianess%)
+            (+ pos 2)))
+
+  (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">read-u32</span> bytes pos)
+    (values (bytevector-u32-ref bytes pos endianess%)
+            (+ pos 4)))
+
+  (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">read-u64</span> bytes pos)
+    (values (bytevector-u64-ref bytes pos endianess%)
+            (+ pos 8)))
+
+  (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">read-u128</span> bytes pos)
+    (<span style="color: #1054AF; font-weight: bold;">let</span> ((v1 (read-u64 bytes (+ pos 0)))
+          (v2 (read-u64 bytes (+ pos 8))))
+      (values (+ (&lt;&lt; v1 64) v2)
+              (+ pos 16))))
+
+  (<span style="color: #1054AF; font-weight: bold;">define</span> <span style="color: #444444;">write-bytes!</span>
+    (<span style="color: #1054AF; font-weight: bold;">case-lambda</span>
+      ((dest pos src) (write-bytes! dest pos src 0))
+      ((dest pos src pos*)
+       (<span style="color: #1054AF; font-weight: bold;">let</span> ((len (- (bytevector-length src) pos*)))
+         (bytevector-copy! src pos* dest pos len)
+         (+ pos len)))))
+
+
+  (<span style="color: #1054AF; font-weight: bold;">define</span> <span style="color: #444444;">read-bytes</span>
+    (<span style="color: #1054AF; font-weight: bold;">case-lambda</span>
+      ((src start) (read-bytes src start (bytevector-length src)))
+      ((src start stop)
+       (<span style="color: #1054AF; font-weight: bold;">let*</span> ((len  (- stop start))
+              (dest (make-bytevector len)))
+         (bytevector-copy! src start dest 0 len)
+         (values dest stop))))))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-orgf6edabb" class="outline-3">
+<h3 id="orgf6edabb"><span class="section-number-3">10.3.</span> Cryptographic primitives</h3>
+<div class="outline-text-3" id="text-10-3">
+<p>
+For the cryptographic operations, we use bindings to GnuTLS.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #1054AF; font-weight: bold;">library</span> (<span style="color: #444444; font-weight: bold;">sse</span> crypto)
+  (<span style="color: #1054AF; font-weight: bold;">export</span> rng sha3
+          aes-gcm-256:init
+          aes-gcm-256:keygen
+          aes-gcm-256:encrypt
+          aes-gcm-256:decrypt)
+  (<span style="color: #1054AF; font-weight: bold;">import</span> (rnrs base) (gnutls) (sse serialization))
+
+  (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">rng</span> n) (gnutls-random random-level/key n))
+
+  (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">sha3</span> bytes) (hash-direct digest/sha3-256 bytes))
+
+  (<span style="color: #1054AF; font-weight: bold;">define</span> <span style="color: #444444;">nonce-length</span> 12)
+
+  (<span style="color: #1054AF; font-weight: bold;">define</span> <span style="color: #444444;">associated-data</span> (make-bytevector 0))
+
+  (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">aes-gcm-256:keygen</span>) (rng 32))
+
+  (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">aes-gcm-256:init</span> key)
+    (make-aead-cipher cipher/aes-256-gcm key))
+
+  (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">aes-gcm-256:encrypt</span> cipher ptx)
+    (<span style="color: #1054AF; font-weight: bold;">let*</span> ((nonce  (rng nonce-length))
+           (bytes  (aead-cipher-encrypt
+                    cipher nonce associated-data 0 ptx)))
+      (<span style="color: #1054AF; font-weight: bold;">let</span> ((ctx (make-bytevector (+ nonce-length (bytevector-length bytes)))))
+        (write-bytes! ctx 0 nonce)
+        (write-bytes! ctx nonce-length bytes)
+        ctx)))
+
+  (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">aes-gcm-256:decrypt</span> cipher ctx)
+    (<span style="color: #1054AF; font-weight: bold;">let</span> ((nonce  (read-bytes ctx 0 nonce-length))
+          (bytes  (read-bytes ctx nonce-length)))
+      (aead-cipher-decrypt cipher nonce associated-data 0 bytes))))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org57f4717" class="outline-3">
+<h3 id="org57f4717"><span class="section-number-3">10.4.</span> The \(\ploc\) scheduler</h3>
+<div class="outline-text-3" id="text-10-4">
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #1054AF; font-weight: bold;">library</span> (<span style="color: #444444; font-weight: bold;">sse</span> ploc scheduler)
+  (<span style="color: #1054AF; font-weight: bold;">export</span> make-scheduler)
+  (<span style="color: #1054AF; font-weight: bold;">import</span> (rnrs base)
+          (<span style="color: #1054AF; font-weight: bold;">only</span> (rnrs r5rs) modulo)
+          (sse utils))
+
+  (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">make-scheduler</span> n)
+      (assert (integer? (lg n)))
+      (<span style="color: #1054AF; font-weight: bold;">let</span> ((counter 0) (prefixes (iota n)))
+        (<span style="color: #1054AF; font-weight: bold;">&#955;</span> ()
+          (<span style="color: #1054AF; font-weight: bold;">set!</span> counter (+ counter 1))
+          (<span style="color: #1054AF; font-weight: bold;">map</span> (<span style="color: #1054AF; font-weight: bold;">&#955;</span> (pfx) (+ pfx (* counter n)))
+               prefixes)))))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org9b8133a" class="outline-3">
+<h3 id="org9b8133a"><span class="section-number-3">10.5.</span> The \(\ploc\) scheme</h3>
+<div class="outline-text-3" id="text-10-5">
+<p>
+We give here the complete code that allows to run a \(\ploc\) client.
+</p>
+
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #1054AF; font-weight: bold;">library</span> (<span style="color: #444444; font-weight: bold;">sse</span> ploc)
+  (<span style="color: #1054AF; font-weight: bold;">export</span> make-ploc)
+  (<span style="color: #1054AF; font-weight: bold;">import</span> (guile)
+          (rnrs base)
+          (rnrs lists)
+          (rnrs control)
+          (sse tree)
+          (sse utils)
+          (sse crypto)
+          (sse serialization)
+          (sse ploc scheduler)
+          (srfi <span style="color: #444444;">:11</span>))
+
+
+  (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">new-datum</span> target value)
+    (vector target value))
+
+  (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">datum-&gt;target</span> datum) (vector-ref datum 0))
+  (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">datum-&gt;value</span>  datum) (vector-ref datum 1))
+
+
+  (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">make-ploc</span> n N V c H value-size read-value write-value!
+                     <span style="color: #005500;">;; </span><span style="color: #005500;">Tree dependencies.</span>
+                     G AE-init AE-keygen AE-encrypt AE-decrypt
+                     memory-setup memory-read memory-write)
+
+    (assert (u8?  c))
+    (assert (u64? n))
+    (assert (u64? N))
+    (assert (u64? V))
+
+    (<span style="color: #1054AF; font-weight: bold;">define</span> <span style="color: #444444;">datum-size</span> (+ 16 value-size))
+
+    (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">write-datum!</span> bytes pos datum)
+      (<span style="color: #1054AF; font-weight: bold;">let*</span> ((pos (write-u128!  bytes pos (datum-&gt;target datum)))
+             (pos (write-value! bytes pos (datum-&gt;value  datum))))
+        pos))
+
+    (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">read-datum</span> bytes pos)
+      (<span style="color: #1054AF; font-weight: bold;">let*-values</span> (((target pos) (read-u128  bytes pos))
+                    ((value  pos) (read-value bytes pos)))
+        (values (new-datum target value)
+                pos)))
+
+    (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">data-&gt;bytes</span> data)
+      (assert (&lt;= (length data) c))
+      (<span style="color: #1054AF; font-weight: bold;">let</span> ((bytes (make-u8vector (+ 1 (* c datum-size)))))
+        (foldl (<span style="color: #1054AF; font-weight: bold;">&#955;</span> (pos datum) (write-datum! bytes pos datum))
+               (write-u8! bytes 0 (length data))
+               data)
+        bytes))
+
+    (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">bytes-&gt;data</span> bytes)
+      (assert (= (+ 1 (* c datum-size)) (bytevector-length bytes)))
+      (<span style="color: #1054AF; font-weight: bold;">let-values</span> (((len pos) (read-u8 bytes 0)))
+        (assert (&lt;= len c))
+        (<span style="color: #1054AF; font-weight: bold;">let</span> <span style="color: #444444;">loop</span> ((i 0) (pos pos) (data (list)))
+          (<span style="color: #1054AF; font-weight: bold;">if</span> (= i len)
+              data
+              (<span style="color: #1054AF; font-weight: bold;">let-values</span> (((datum pos) (read-datum bytes pos)))
+                (loop (+ i 1) pos (cons datum data)))))))
+
+    (<span style="color: #1054AF; font-weight: bold;">define-values</span> (tree-setup tree-fetch tree-merge)
+      (make-tree N G data-&gt;bytes bytes-&gt;data
+                 AE-init AE-keygen AE-encrypt AE-decrypt
+                 memory-setup memory-read memory-write))
+
+    (<span style="color: #1054AF; font-weight: bold;">define</span> <span style="color: #444444;">scheduler</span> (make-scheduler n))
+
+    (<span style="color: #1054AF; font-weight: bold;">define</span> <span style="color: #444444;">volumes</span> (make-hmap))
+
+    (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">get-volume</span> label)
+      (hmap-find volumes label 0))
+
+    (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">increment-volume</span> label)
+      (<span style="color: #1054AF; font-weight: bold;">let</span> ((volume (get-volume label)))
+        (hmap-bind! volumes label (+ volume 1))))
+
+    (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">get-target</span> key label volume)
+      (H key label volume))
+
+    (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">make-datum</span> key label value)
+      (<span style="color: #1054AF; font-weight: bold;">let*</span> ((volume (get-volume label))
+             (target (get-target key label volume)))
+        (new-datum target value)))
+
+    (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">get-all-targets</span> key label)
+      (<span style="color: #1054AF; font-weight: bold;">map</span> (<span style="color: #1054AF; font-weight: bold;">&#955;</span> (v) (get-target key label v))
+           (iota V)))
+
+    (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">find-data</span> subtree target)
+      (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">matching-datum?</span> datum)
+        (= (datum-&gt;target datum) target))
+      (filter matching-datum? (branch-data subtree target)))
+
+    (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">compact</span> node depth data)
+      (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">left-datum?</span> datum)
+        (go-left? depth (datum-&gt;target datum)))
+      (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">direct-data</span> data)
+        (split-with left-datum? data))
+      (<span style="color: #1054AF; font-weight: bold;">match</span> node
+        (#(node-data l-child r-child)
+         (<span style="color: #1054AF; font-weight: bold;">let*-values</span>
+             (((l-data  r-data) (direct-data (append node-data data)))
+              ((l-child l-data) (compact l-child (+ depth 1) l-data))
+              ((r-child r-data) (compact r-child (+ depth 1) r-data))
+              ((node-data rest) (take c (append l-data r-data))))
+           (values (make-node node-data l-child r-child) rest)))
+        (_ (values node data))))
+
+    (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">ploc-setup</span>) (tree-setup))
+
+    (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">ploc-insert</span> key label value)
+      (<span style="color: #1054AF; font-weight: bold;">let</span> ((data    (list (make-datum key label value)))
+            (subtree (tree-fetch key (scheduler))))
+        (<span style="color: #1054AF; font-weight: bold;">let-values</span> (((subtree data) (compact subtree 0 data)))
+          (<span style="color: #1054AF; font-weight: bold;">unless</span> (null? data)
+            (error <span style="color: #880000;">"tree overflow"</span> subtree label value))
+          (increment-volume label)
+          (tree-merge key subtree))))
+
+    (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">ploc-search</span> key label)
+      (<span style="color: #1054AF; font-weight: bold;">let*</span> ((targets  (get-all-targets key label))
+             (subtree  (tree-fetch key targets)))
+        (reverse
+         (foldl (<span style="color: #1054AF; font-weight: bold;">&#955;</span> (result target)
+                  (<span style="color: #1054AF; font-weight: bold;">match</span> (find-data subtree target)
+                    (()      result)
+                    ((datum) (cons (datum-&gt;value datum) result))
+                    ( data   (error ploc-search
+                                    <span style="color: #880000;">"more than one datum found"</span>
+                                    data))))
+                (list)
+                targets))))
+
+    (values ploc-setup ploc-search ploc-insert)))
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org752df5d" class="outline-3">
+<h3 id="org752df5d"><span class="section-number-3">10.6.</span> Secure tree</h3>
+<div class="outline-text-3" id="text-10-6">
+<div class="org-src-container">
+<pre class="src src-scheme">(<span style="color: #1054AF; font-weight: bold;">library</span> (<span style="color: #444444; font-weight: bold;">sse</span> tree)
+  (<span style="color: #1054AF; font-weight: bold;">export</span> make-node go-left? branch-data make-tree)
+  (<span style="color: #1054AF; font-weight: bold;">import</span> (rnrs base) (sse utils) (sse serialization))
+
+  (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">make-node</span> data l-child r-child)
+    (vector data l-child r-child))
+
+  (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">node-&gt;data</span>    node) (vector-ref node 0))
+  (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">node-&gt;l-child</span> node) (vector-ref node 1))
+  (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">node-&gt;r-child</span> node) (vector-ref node 2))
+
+  (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">go-left?</span> depth branch)
+    (zero? (&amp;&amp; (&lt;&lt; 1 depth) branch)))
+
+  (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">l-child-id</span> node-id) (+ (&lt;&lt; node-id 1) 0))
+  (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">r-child-id</span> node-id) (+ (&lt;&lt; node-id 1) 1))
+
+  (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">next-node-id</span> node-id depth target)
+    (<span style="color: #1054AF; font-weight: bold;">if</span> (go-left? depth target)
+        (l-child-id node-id)
+        (r-child-id node-id)))
+
+  (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">branch-data</span> tree target)
+    (<span style="color: #1054AF; font-weight: bold;">let</span> <span style="color: #444444;">loop</span> ((node tree) (node-id 0) (depth 0))
+      (<span style="color: #1054AF; font-weight: bold;">match</span> node
+        (#(bytes l-child r-child)
+         (append bytes
+                 (<span style="color: #1054AF; font-weight: bold;">if</span> (go-left? depth target)
+                     (loop l-child (l-child-id node-id) (+ depth 1))
+                     (loop r-child (r-child-id node-id) (+ depth 1)))))
+        ('() (list)))))
+
+
+  (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">make-tree</span> N G data-&gt;bytes bytes-&gt;data
+                     AE-init AE-keygen AE-encrypt AE-decrypt
+                     memory-setup memory-read memory-write)
+
+    (<span style="color: #1054AF; font-weight: bold;">define</span> <span style="color: #444444;">max-depth</span> (lg N))
+
+    (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">make-address</span> node-id depth) (G node-id depth))
+
+    (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">subtree-addresses</span> branches)
+      (hset-&gt;list
+       (foldl (<span style="color: #1054AF; font-weight: bold;">&#955;</span> (addresses branch)
+                (foldl hset-add!
+                       addresses
+                       (branch-addresses branch)))
+              (make-hset)
+              branches)))
+
+    (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">branch-addresses</span> branch)
+      (<span style="color: #1054AF; font-weight: bold;">let</span> <span style="color: #444444;">loop</span> ((node-id 0) (depth 0))
+        (<span style="color: #1054AF; font-weight: bold;">if</span> (&lt; max-depth depth)
+            (list)
+            (cons (make-address node-id depth)
+                  (loop (next-node-id node-id depth branch)
+                        (+ depth 1))))))
+
+    (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">bindings-&gt;tree</span> get-word word-&gt;data)
+      (<span style="color: #1054AF; font-weight: bold;">define</span> <span style="color: #444444;">sentinel</span> (list))
+      (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">unread?</span> word) (eq? word 'unread))
+      (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">free?</span>   word) (eq? word 'free))
+      (<span style="color: #1054AF; font-weight: bold;">let</span> <span style="color: #444444;">loop</span> ((node-id 0) (depth 0))
+        (<span style="color: #1054AF; font-weight: bold;">let*</span> ((address (make-address node-id depth))
+               (word    (get-word address)))
+          (<span style="color: #1054AF; font-weight: bold;">if</span> (unread? word)
+              sentinel
+              (make-node (<span style="color: #1054AF; font-weight: bold;">if</span> (free? word) (list) (word-&gt;data word))
+                         (loop (l-child-id node-id) (+ depth 1))
+                         (loop (r-child-id node-id) (+ depth 1)))))))
+
+    (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">tree-&gt;bindings</span> tree data-&gt;word)
+      (<span style="color: #1054AF; font-weight: bold;">let</span> <span style="color: #444444;">loop</span> ((node tree) (node-id 0) (depth 0))
+        (<span style="color: #1054AF; font-weight: bold;">match</span> node
+          (#(data l-child r-child)
+           (<span style="color: #1054AF; font-weight: bold;">let</span> ((address (make-address node-id depth))
+                 (word    (data-&gt;word data)))
+             (append (list (cons address word))
+                     (loop l-child (l-child-id node-id) (+ depth 1))
+                     (loop r-child (r-child-id node-id) (+ depth 1)))))
+          (_ (list)))))
+
+    (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">tree-setup</span>)
+      (memory-setup)
+      (AE-keygen))
+
+    (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">tree-fetch</span> key branches)
+      (<span style="color: #1054AF; font-weight: bold;">define</span> <span style="color: #444444;">AE</span> (AE-init key))
+      (<span style="color: #1054AF; font-weight: bold;">let*</span> ((addresses (subtree-addresses branches))
+             (words     (memory-read addresses))
+             (bindings  (foldl hmap-bind! (make-hmap) addresses words)))
+        (bindings-&gt;tree
+         (<span style="color: #1054AF; font-weight: bold;">&#955;</span> (address) (hmap-find bindings address 'unread))
+         (<span style="color: #1054AF; font-weight: bold;">&#955;</span> (bytes) (bytes-&gt;data (AE-decrypt AE bytes))))))
+
+    (<span style="color: #1054AF; font-weight: bold;">define</span> (<span style="color: #444444;">tree-merge</span> key subtree)
+      (<span style="color: #1054AF; font-weight: bold;">define</span> <span style="color: #444444;">AE</span> (AE-init key))
+      (<span style="color: #1054AF; font-weight: bold;">let</span> ((data-&gt;word (<span style="color: #1054AF; font-weight: bold;">&#955;</span> (data) (AE-encrypt AE (data-&gt;bytes data)))))
+        (memory-write (tree-&gt;bindings subtree data-&gt;word))
+        (values)))
+
+    (values tree-setup tree-fetch tree-merge)))
+</pre>
+</div>
+</div>
+</div>
+</div>
+<div id="footnotes">
+<h2 class="footnotes">Footnotes: </h2>
+<div id="text-footnotes">
+
+<div class="footdef"><sup><a id="fn.1" class="footnum" href="#fnr.1" role="doc-backlink">1</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">It  is also
+available as a <a href="https://github.com/Cosmian/ploc-article">Github repository</a>.</p></div></div>
+
+<div class="footdef"><sup><a id="fn.2" class="footnum" href="#fnr.2" role="doc-backlink">2</a></sup> <div class="footpara" role="doc-footnote"><p class="footpara">The entire reference implementation given in appendix <a href="#org238a999">10</a>  is less  than 400  lines long.</p></div></div>
+
+
+</div>
+</div></div>
+<div id="postamble" class="status">
+<p class="date">Created: 2025-09-18 Thu 13:03</p>
+<p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>
