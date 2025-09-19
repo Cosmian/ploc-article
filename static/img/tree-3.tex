@@ -1,0 +1,31 @@
+\documentclass{standalone}
+\usepackage{tikz}
+\begin{document}
+\begin{tikzpicture}[thick,
+  level 1/.style={sibling distance=3cm},
+  level 2/.style={sibling distance=1.5cm},
+  level 3/.style={sibling distance=.75cm}]
+  \node [draw, circle] {}
+  child { node [draw, circle] {}
+    child { node [draw, circle] {}
+      child [dotted] { node [draw, circle] {} }
+      child { node [draw, circle] {} }
+    }
+    child [dotted] { node [draw, circle] {}
+      child { node [draw, circle] {} }
+      child { node [draw, circle] {} }
+    }
+  }
+  child { node [draw, circle] {}
+    child { node [draw, circle] {}
+      child [dotted] { node [draw, circle] {} }
+      child { node [draw, circle] {} }
+    }
+    child [dotted] { node [draw, circle] {}
+      child { node [draw, circle] {} }
+      child { node [draw, circle] {} }
+    }
+  }
+  ;
+\end{tikzpicture}
+\end{document}
