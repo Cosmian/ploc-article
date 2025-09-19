@@ -10,7 +10,6 @@
 #+latex_class_options: [9pt,a4paper]
 
 #+bibliography: ./ploc-article.bib
-#+cite_export: biblatex numeric,backend=bibtex
 
 #+latex_header: \author{Théophile Brézot \thanks{Cosmian: theophile.brezot@cosmian.com} \and Chloé Hébant \thanks{Cosmian: chloe.hebant@cosmian.com}}
 
