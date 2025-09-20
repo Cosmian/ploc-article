@@ -1,5 +1,7 @@
 #+title: All paths lead to the root
 #+latex_header: \usepackage{tikz}
+#+latex_header: \renewcommand{\sec}{\textrm{sec}}
+#+latex_header: \newcommand{\msec}{\textrm{msec}}
 
 ** We are on e-print (2025/XXX)!
 
@@ -497,23 +499,49 @@ $t=2$ & $t=3$
 Can the compaction prevent tree overflow?
 #+end_quote
 
-** Conclusion
-
-\vfill
+** Conclusion -- \textsc{ploc} is /injection-secure/
 
 - $\mathcal{L}(Search, label) = \{target\text{-}branch\}$
 
 - $\mathcal{L}(Insert, label, value) = \bot$
 
+** Conclusion -- \textsc{ploc} is /efficient/
+
 \vfill
 
-#+begin_quote
-\textsc{ploc} is an injection-secure multi-map encryption scheme!
-#+end_quote
+With a /simple/ implementation:
+
+\vfill
+
+#+begin_export latex
+\begin{table}
+  \centering
+  \begin{tabular}{l|lll}
+    \(n\) $\backslash$\ \(B\) & \(2^{10}\) & \(2^{16}\) & \(2^{20}\)\\
+    \hline
+    \(16\) & \(2.1\msec \quad 1.8\msec\) & \(26\msec \quad 3.1\msec\) & \(0.17\sec \quad 3.8\msec\)\\
+    \(64\) & \(2.1\msec \quad 5.4\msec\) & \(25\msec \quad 11\msec\) & \(0.12\sec \quad 13\msec\)\\
+    \(256\) & \(2.0\msec \quad 18\msec\) & \(25\msec \quad 34\msec\) & \(0.12\sec \quad 45\msec\)\\
+  \end{tabular}
+  \caption{(\(Search \quad Insert\)) performances in function of \(n\) and \(B\) for \(V = \sqrt{B}\).}
+\end{table}
+#+end_export
+
+\vfill
 
 \vfill
 
 * Future works
+** Can we improve the performance?
+
+- Search performance is in $O(V)$:
+  - can we store more than one datum per target branch? $\Rightarrow
+    O(\frac{V}{m})$
+    \newline
+
+- Search bandwidth is in $O(c \lg B)$:
+  - can we reduce the depth by $\lg c$? $\Rightarrow O(\lg B)$
+
 ** What about concurrency?
 
 Reliance on an synchronized mutable state due to:
