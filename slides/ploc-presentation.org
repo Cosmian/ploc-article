@@ -1,0 +1,595 @@
+#+title: All paths lead to the root
+#+latex_header: \usepackage{tikz}
+
+** We are on e-print (2025/XXX)!
+
+[[file:img/paper-header.png]]
+
+* Searchable Symmetric Encryption (SSE)
+** How to retrieve data from an adversary server?
+
+#+begin_src dot  :exports results :file img/db.svg :results replace
+  graph DB_flow {
+          rankdir = LR;
+          client[shape="rectangle"]
+          subgraph cluster_server {
+                  label="Adversary Server"
+                  subgraph cluster_DB {
+                          label="Database"
+                          node[shape="cylinder"]
+                          indexes;
+                          storage;
+                  }
+          }
+          rank="same"
+          client--indexes[label="1. get(label) -> location" minlen=4]
+          client--storage[label="2. get(location) -> data"  minlen=4]
+  }
+#+end_src
+
+Leaks:
+1. the label and the location;
+2. the location and the data.
+
+** Controlling the leakage
+
+#+begin_src dot  :exports results :file img/db-secure-search.svg :results replace
+  graph DB_flow {
+          rankdir = LR;
+          client[shape="rectangle"]
+          subgraph cluster_server {
+                  label="Adversary Server"
+                  subgraph cluster_DB {
+                          label="Database"
+                          node[shape="cylinder"]
+                          indexes[label="SSE (indexes)"];
+                          storage[label="SE  (storage)"];
+                  }
+          }
+          rank="same"
+          client--indexes[label="1. secure-search(label)"     minlen=4]
+          client--storage[label="2. secure-search(location)"  minlen=4]
+  }
+#+end_src
+
+Leaks:
+1. $\mathcal L_{SSE}(label)$;
+2. $\mathcal L_{SE}(location)$.
+
+** Supporting dynamic states
+
+#+begin_src dot  :exports results :file img/db-secure-insert.svg :results replace
+  graph DB_flow {
+          rankdir = LR;
+          client[shape="rectangle"]
+          subgraph cluster_server {
+                  label="Adversary Server"
+                  subgraph cluster_DB {
+                          label="Database"
+                          node[shape="cylinder"]
+                          indexes[label="SSE (indexes)"];
+                          storage[label="SE  (storage)"];
+                  }
+          }
+          rank="same"
+          client--storage[label="1. secure-insert(data)"            minlen=4]
+          client--indexes[label="2. secure-insert(label, location)" minlen=4]
+  }
+#+end_src
+
+Leaks:
+1. $\mathcal L_{SE}(Insert, data)$.
+2. $\mathcal L_{SSE}(Insert, label, location)$;
+
+** Supporting concurrent queries
+
+#+begin_src dot  :exports results :file img/db-secure-concurrent.svg :results replace
+  graph DB_flow {
+          rankdir = LR;
+          client1[label="client 1" shape="rectangle"]
+          client2[label="client 2" shape="rectangle"]
+          client3[label="client 3" shape="rectangle"]
+          subgraph cluster_server {
+                  label="Adversary Server"
+                  subgraph cluster_DB {
+                          label="Database"
+                          node[shape="cylinder"]
+                          indexes[label="SSE (indexes)"];
+                          storage[label="SE  (storage)"];
+                  }
+          }
+          rank="same"
+          client1--indexes[label="1. secure-search(label)"    minlen=4]
+          client1--storage[label="2. secure-search(location)" minlen=4]
+          client2--storage[label="1. secure-insert(data)"     minlen=4]
+          client2--indexes[label="2. secure-insert(location)" minlen=4]
+          client3--indexes[label="1. secure-search(label)"    minlen=4]
+          client3--storage[label="2. secure-search(location)" minlen=4]
+  }
+#+end_src
+
+* Structured Encryption
+** Index
+
+*Index ADT*:
+- /States/: $\mathbb{L}^{ \mathbb{V}^*}$
+- /Operations/:
+  - Search :: ~:: state -> label -> Set value~
+  - Insert :: ~:: state -> label -> value -> ()~
+
+*Index STE*:
+- /States/: $\mathbb{K}^{\mathbb{L}^{\mathbb{V}^*}}$
+- /Operations/:
+  - Setup  :: ~:: () -> (key * IO ())~
+  - Search :: ~:: key -> label -> IO (Set value)~
+  - Insert :: ~:: key -> label -> value -> IO ()~
+
+** Multi-Map (MM)
+
+*MM ADT*:
+- /States/: $\mathbb{L}^{ \mathbb{V}^*}$
+- /Operations/:
+  - Search :: ~:: state -> label -> List value~
+  - Insert :: ~:: state -> label -> value -> ()~
+
+*MM STE*:
+- /States/: $\mathbb{K}^{\mathbb{L}^{\mathbb{V}^*}}$
+- /Operations/:
+  - Setup  :: ~:: () -> (key * IO ())~
+  - Search :: ~:: key -> label -> IO (List value)~
+  - Insert :: ~:: key -> label -> value -> IO ()~
+
+** Multi-Map STE to Index STE transformation
+
+- Index setup and search are the very MM operations:
+  #+begin_example
+  Index::setup  = MM::setup
+  Index::insert = MM::insert
+  #+end_example
+- The result of an Index search is the result of the MM search without
+  duplicates:
+  #+begin_example
+  Index::search = unique . MM::search
+                  where
+                    unique vs = fold Set::insert
+                                     EmptySet vs
+  #+end_example
+
+* Why bother implementing a more constrained ADT?
+** Semi-dynamic MM to fully-dynamic MM transformation
+
+*Associative ADT*:
+
+/States/: $\mathbb{L}^{ \mathbb{T}(\mathbb{V})}$
+
+/Operations/:
+- Search :: ~:: s -> l -> T v~
+- Mutate :: ~:: (Mutation M) => s -> l -> M T v -> ()~
+
+  where:
+  #+begin_example
+    class (Container T) => Mutation T v where
+      apply :: v -> (T v) -> (T v)
+  #+end_example
+
+** Semi-dynamic MM to fully-dynamic MM transformation
+
+The fully-dynamic Multi-Map is an associative ADT:
+- Insertion:
+  #+begin_example
+  instance Mutation (MMInsertion List value) where
+    (apply) = (Cons)
+  #+end_example
+- Deletion:
+  #+begin_example
+  instance Mutation (MMDeletion List value) where
+    (apply) = (remove)
+              where
+                remove v []    = []
+                remove v [v l] = remove v l
+                remove v [w l] = Cons w (remove v l)
+  #+end_example
+
+** Semi-dynamic MM to fully-dynamic MM transformation
+
+#+begin_quote
+Specialized mutations are ~T~ transformations[fn::More precisely, they form a
+monoid and can therefore be reduced.]:
+
+all we need is to log them!
+#+end_quote
+\vspace{1em}
+
+*Journaling Multi-Map ADT*:
+- /States/: $\mathbb L^{(\mathbb T(\mathbb V)^{\mathbb{T}(\mathbb{V})})^*}$
+- /Operations/:
+  + Search :: ~state -> l -> List (Tx T v)~
+  + Insert :: ~state -> l -> (Tx T v) -> ()~
+  where ~Tx T v = T v -> T v~.
+
+** Semi-dynamic MM to fully-dynamic MM transformation
+
+\vfill
+
+#+begin_quote
+Implementing any (fully-dynamic) associative ADT on top of a (semi-dynamic)
+multi-map is therefore simple!
+#+end_quote
+
+\vfill
+
+#+begin_example
+search s l     = let transformations = MM::search s l
+                 in (reduce transformations) T::empty
+
+mutate s l m v = MM::insert s l (m v)
+#+end_example
+
+\vfill
+
+* \textsc{PLOC} is actually /simple/!
+** Challenge
+
+1. Do not to leak anything during insertion: $\mathcal L(Insert, label, value) =
+   \bot$ \vspace{2em}
+
+2. Only leak a (meaningless) UID of the label: $\mathcal L(Search, label) =
+   \mathrm{sp}$
+
+** Search
+
+Simply derive the set of target branches:
+- $\mathrm{PRF}(key, cat, 0) = 3 = \mathtt{b011}$
+- $\mathrm{PRF}(key, cat, 1) = 2 = \mathtt{b010}$
+- $\mathrm{PRF}(key, cat, 2) = 6 = \mathtt{b110}$
+
+Mind the endianness!
+
+#+begin_export latex
+\begin{figure}[h]
+\center
+\begin{tikzpicture}[thick,
+  level 1/.style={sibling distance=3cm},
+  level 2/.style={sibling distance=1.5cm},
+  level 3/.style={sibling distance=.75cm}]
+  \node [draw, circle] {} [red]
+  child { node [draw, circle] {}
+    child [black] { node [draw, circle] {}
+      child { node [draw, circle] { 0 } edge from parent node[left]  {0}}
+      child { node [draw, circle] { 4 } edge from parent node[right] {1}}
+      edge from parent node[left] {0}
+    }
+    child { node [draw, circle] {}
+      child { node [draw, circle] { 2 } edge from parent node[left]  {0} }
+      child { node [draw, circle] { 6 } edge from parent node[right] {1} }
+      edge from parent node[right] {1}
+    }
+    edge from parent node[left] {0}
+  }
+  child { node [draw, circle] {}
+    child [black] { node [draw, circle] {}
+      child { node [draw, circle] { 1 } edge from parent node[left]  {0} }
+      child { node [draw, circle] { 5 } edge from parent node[right] {1} }
+      edge from parent node[left] {0}
+    }
+    child { node [draw, circle] {}
+      child { node [draw, circle] { 3 }          edge from parent node[left]  {0}}
+      child [black] { node [draw, circle] { 7 }  edge from parent node[right] {1}}
+      edge from parent node[right] {1}
+   }
+   edge from parent node[right] {1}
+  }
+  ;
+\end{tikzpicture}
+\end{figure}
+#+end_export
+
+** Insert -- Datum
+
+~type Datum = target * value~ \newline
+
+#+begin_quote
+A datum must always be stored on its target branch.
+#+end_quote
+
+For example with ~(6 food)~:
+
+#+begin_export latex
+\begin{figure}[h]
+\center
+\begin{tikzpicture}[thick,
+  level 1/.style={sibling distance=3cm},
+  level 2/.style={sibling distance=1.5cm},
+  level 3/.style={sibling distance=.75cm}]
+  \node [draw, circle] {} [red]
+  child { node [draw, circle] {}
+    child [black] { node [draw, circle] {}
+      child { node [draw, circle] { }}
+      child { node [draw, circle] { }}
+    }
+    child { node [draw, circle] {}
+      child [black] { node [draw, circle] { 2 }}
+      child { node [draw, circle] { 6 }}
+    }
+  }
+  child [black] { node [draw, circle] {}
+    child { node [draw, circle] {}
+      child { node [draw, circle] { }}
+      child { node [draw, circle] { }}
+    }
+    child { node [draw, circle] {}
+      child { node [draw, circle] { 3 }}
+      child { node [draw, circle] { }}
+   }
+  }
+  ;
+\end{tikzpicture}
+\end{figure}
+#+end_export
+
+** Insertion -- Uniform Scheduling
+
+#+begin_export latex
+\begin{figure}[h]
+\begin{tabular}{cc}
+\includegraphics[height=.25\textheight]{../img/tree-1.pdf}
+&
+\includegraphics[height=.25\textheight]{../img/tree-2.pdf}
+\\
+$t=0$ & $t=1$
+\\
+&
+\\
+\includegraphics[height=.25\textheight]{../img/tree-3.pdf}
+&
+\includegraphics[height=.25\textheight]{../img/tree-4.pdf}
+\\
+$t=2$ & $t=3$
+\\
+\end{tabular}
+\caption{Scheduled subtrees for $N=8$ and $n=2$.\label{fig:scheduling}}
+\end{figure}
+#+end_export
+
+** Insert -- Compaction 1
+
+#+begin_export latex
+\begin{figure}
+\center
+\begin{tikzpicture}[thick,
+  level 1/.style={sibling distance=6cm},
+  level 2/.style={sibling distance=3cm},
+  level 3/.style={sibling distance=1.5cm}]
+  \node [draw, circle] {} [red]
+  child { node [draw, circle] {(6 food)}
+    child [black] { node [draw, circle] {}
+      child { node [draw, circle] {} }
+      child [dotted] { node [draw, circle] {} }
+    }
+    child [dotted] { node [draw, circle] {}
+      child [black] { node [draw, circle] {} }
+      child { node [draw, circle] { 6 } }
+    }
+  }
+  child [black] { node [draw, circle] {}
+    child { node [draw, circle] {}
+      child { node [draw, circle] {} }
+      child [dotted] { node [draw, circle] {} }
+    }
+    child [dotted] { node [draw, circle] {}
+      child { node [draw, circle] {} }
+      child { node [draw, circle] {} }
+    }
+  }
+  ;
+\end{tikzpicture}
+\end{figure}
+#+end_export
+
+** Insert -- Compaction 2
+
+#+begin_export latex
+\begin{figure}
+\center
+\begin{tikzpicture}[thick,
+  level 1/.style={sibling distance=6cm},
+  level 2/.style={sibling distance=3cm},
+  level 3/.style={sibling distance=1.5cm}]
+  \node [draw, circle] {} [red]
+  child { node [draw, circle] {}
+    child [dotted, black] { node [draw, circle] {}
+      child { node [draw, circle] {} }
+      child { node [draw, circle] {} }
+    }
+    child { node [draw, circle] {(6 food)}
+      child [black] { node [draw, circle] {} }
+      child [dotted] { node [draw, circle] { 6 } }
+    }
+  }
+  child [black] { node [draw, circle] {}
+    child [dotted] { node [draw, circle] {}
+      child { node [draw, circle] {} }
+      child { node [draw, circle] {} }
+    }
+    child { node [draw, circle] {}
+      child { node [draw, circle] {} }
+      child [dotted] { node [draw, circle] {} }
+    }
+  }
+  ;
+\end{tikzpicture}
+\end{figure}
+#+end_export
+
+** Insert -- Compaction 3
+
+#+begin_export latex
+\begin{figure}
+\center
+\begin{tikzpicture}[thick,
+  level 1/.style={sibling distance=6cm},
+  level 2/.style={sibling distance=3cm},
+  level 3/.style={sibling distance=1.5cm}]
+  \node [draw, circle] {} [red]
+  child { node [draw, circle] {}
+    child [black] { node [draw, circle] {}
+      child [dotted] { node [draw, circle] {} }
+      child { node [draw, circle] {} }
+    }
+    child [dotted] { node [draw, circle] {(6 food)}
+      child [black] { node [draw, circle] {} }
+      child { node [draw, circle] { 6 } }
+    }
+  }
+  child [black] { node [draw, circle] {}
+    child { node [draw, circle] {}
+      child [dotted] { node [draw, circle] {} }
+      child { node [draw, circle] {} }
+    }
+    child [dotted] { node [draw, circle] {}
+      child { node [draw, circle] {} }
+      child { node [draw, circle] {} }
+    }
+  }
+  ;
+\end{tikzpicture}
+\end{figure}
+#+end_export
+
+** Insert -- Compaction 4
+
+#+begin_export latex
+\begin{figure}
+\center
+\begin{tikzpicture}[thick,
+  level 1/.style={sibling distance=6cm},
+  level 2/.style={sibling distance=3cm},
+  level 3/.style={sibling distance=1.5cm}]
+  \node [draw, circle] {} [red]
+  child { node [draw, circle] {}
+    child [dotted, black] { node [draw, circle] {}
+      child { node [draw, circle] {} }
+      child { node [draw, circle] {} }
+    }
+    child { node [draw, circle] {}
+      child [dotted, black] { node [draw, circle] {} }
+      child { node [draw, circle] { (6 food) } }
+    }
+  }
+  child [black] { node [draw, circle] {}
+    child [dotted] { node [draw, circle] {}
+      child [dotted] { node [draw, circle] {} }
+      child { node [draw, circle] {} }
+    }
+    child { node [draw, circle] {}
+      child [dotted] { node [draw, circle] {} }
+      child { node [draw, circle] {} }
+    }
+  }
+  ;
+\end{tikzpicture}
+\end{figure}
+#+end_export
+
+** Insert -- Compaction
+
+#+begin_quote
+Can the compaction prevent tree overflow?
+#+end_quote
+
+** Conclusion
+
+\vfill
+
+- $\mathcal{L}(Search, label) = \{target\text{-}branch\}$
+
+- $\mathcal{L}(Insert, label, value) = \bot$
+
+\vfill
+
+#+begin_quote
+\textsc{ploc} is an injection-secure multi-map encryption scheme!
+#+end_quote
+
+\vfill
+
+* Future works
+** What about concurrency?
+
+Reliance on an synchronized mutable state due to:
+
+- MM semantics (order)
+    + implement the index directly?
+    + relax progress property? \vspace{1em}
+
+- Uniform scheduling (next scheduled branches)
+    + can compaction work with a random scheduling?
+    + relax progress property?
+
+** What about concurrency?
+
+Reliance on an synchronized mutable state due to:
+
+- MM semantics (order) $O(L) \Rightarrow$ bad
+    + +implement the index directly?+
+    + relax progress property + relax target selection \vspace{1em}
+
+- Uniform scheduling (next scheduled branches) $O(1)$
+    + +can compaction work with a random scheduling?+
+    + relax progress property?
+
+** What about the data-related leakage?
+
+- Store data directly inside the SSE?
+  + what is the impact on performance?
+    \newline
+    \vspace{1em}
+- Use an independent scheme with no leakage?
+  + with what performances?
+    \newline
+  + can it be compatible with concurrent queries?
+    \newline
+
+** What about the data-related leakage?
+
+- Store data directly inside the SSE?
+  + what is the impact on performance?
+
+    *Big* due to volume-hiding
+    \vspace{1em}
+- Use an independent scheme with no leakage?
+  + with what performances?
+    \newline
+  + can it be compatible with concurrent queries?
+    \newline
+
+** What about the data-related leakage?
+
+- Store data directly inside the SSE?
+  + what is the impact on performance?
+
+    *Big* due to volume-hiding
+    \vspace{1em}
+- Use an independent scheme with no leakage?
+  + with what performances?
+
+    *OK* $O(\log N)$
+  + can it be compatible with concurrent queries?
+    \newline
+
+** What about the data-related leakage?
+
+- Store data directly inside the SSE?
+  + what is the impact on performance?
+
+    *Big* due to volume-hiding
+    \vspace{1em}
+- Use an independent scheme with no leakage?
+  + with what performances?
+
+    *OK* $O(\log N)$
+  + can it be compatible with concurrent queries?
+
+    *NO* requires a lock
+
+* Thanks!
