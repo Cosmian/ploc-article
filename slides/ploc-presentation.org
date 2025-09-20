@@ -3,9 +3,9 @@
 #+latex_header: \renewcommand{\sec}{\textrm{sec}}
 #+latex_header: \newcommand{\msec}{\textrm{msec}}
 
-** We are on e-print (2025/XXX)!
+** We are on [[https://eprint.iacr.org/2025/1672][e-print]]!
 
-[[file:img/paper-header.png]]
+[[file:img/e-print.png]]
 
 * Searchable Symmetric Encryption (SSE)
 ** How to retrieve data from an adversary server?
