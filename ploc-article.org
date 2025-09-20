@@ -1629,7 +1629,7 @@ rather then speed --  are good: on an Intel(R) Core(TM)  i5-6200U CPU @ 2.30GHz,
 we can measure the following timings using GNU Guile v3.10:
 
 #+name: table:performance
-#+caption: Operation performances ($\Search \quad \Insert$) in function of $n$ and $N$ for $V = \sqrt{B}$ and $c$ given in Table [[table:numerical-analysis-lambda=128]].
+#+caption: Operation performances ($\Search \quad \Insert$) in function of $n$ and $B$ for $V = \sqrt{B}$ and $c$ given in Table [[table:numerical-analysis-lambda=128]].
 | /          | <                         |                          |                           |
 | $n$ \\ $B$ | $2^{10}$                  | $2^{16}$                 | $2^{20}$                  |
 |------------+---------------------------+--------------------------+---------------------------|
