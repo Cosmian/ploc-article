@@ -697,7 +697,7 @@ entropy.
 ** Tree Encryption Scheme
 
 $\ploc$  relies on  a  \((s, N)\)-Tree  STE scheme,  defined  as the  structured
-encryption scheme  based on  the ADT  parameterized by $s$  and $N,  which valid
+encryption scheme  based on the  ADT parameterized by  $s$ and $N$,  which valid
 states are the  complete binary trees of  $N$ leaves and nodes of  size $s$, and
 which operations are:
 - $(t, T')  \gets \Fetch(\mathrm{branches},  T)$, that  returns the  subtree $t$
