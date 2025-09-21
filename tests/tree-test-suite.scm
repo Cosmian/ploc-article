@@ -1,0 +1,11 @@
+(import (srfi :64))
+(import (sse utils))
+(import (tests tree))
+
+(for-each (lambda (d-max)
+            (let ((N (<< 1 d-max)))
+              (define name (format #f "tree, N=~a" N))
+              (test-begin name)
+              (test-assert (test-tree N))
+              (test-end name)))
+          (iota 15))
