@@ -2,9 +2,9 @@
   #:use-module (sse utils)
   #:use-module (sse ploc scheduler))
 
-(define (make-psi pp-tree c n N V value-size PRF make-phi)
+(define (make-psi pp-tree c n B V value-size PRF make-phi)
 
-  (define phi (make-phi pp-tree (* c value-size) (lg N)))
+  (define phi (make-phi pp-tree (* c value-size) (lg B)))
 
   (define scheduler (make-scheduler n))
 

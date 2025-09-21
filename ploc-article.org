@@ -1580,9 +1580,9 @@ label upon search, this proves that $\ploc$ is injection-secure.
     #:use-module (sse utils)
     #:use-module (sse ploc scheduler))
 
-  (define (make-psi pp-tree c n N V value-size PRF make-phi)
+  (define (make-psi pp-tree c n B V value-size PRF make-phi)
 
-    (define phi (make-phi pp-tree (* c value-size) (lg N)))
+    (define phi (make-phi pp-tree (* c value-size) (lg B)))
 
     <<scheduler>>
 
@@ -1615,14 +1615,14 @@ The  number  of  rounds  can  be  enumerated from  the  code  of  the  reference
 implementation described in  section [[*Description]].  In the case  of an $\Insert$
 operation, a  subtree of $n$  leaves is successively fetched,  modified locally,
 then  merged  back to  the  main  tree.  Since  the  tree  encryption scheme  is
-instantiated with  $s = c \lg  |\bbV|$ and $D =  \lg N$, the complexity  of both
-tree operations is $O(c \lg |\bbV| \times  n \lg N)$. The compaction of the tree
-being linear in its  size, its complexity is in $O(n \lg N)$.   In the case of a
+instantiated with  $s = c \lg  |\bbV|$ and $D =  \lg B$, the complexity  of both
+tree operations is $O(c \lg |\bbV| \times  n \lg B)$. The compaction of the tree
+being linear in its  size, its complexity is in $O(n \lg B)$.   In the case of a
 $\Search$ operation,  a single tree  $\Fetch$ is performed  on a subtree  of $V$
 leaves, which gives the desired complexity.
 #+end_proof
 
-Theorem [[theorem:performance]]  guarantees  logarithmic  performances  in  $N$  for
+Theorem [[theorem:performance]]  guarantees  logarithmic  performances  in  $B$  for
 $\ploc$, although with a non-negligible constant.  In practice, the performances
 of the  reference implementation given  here --  which is optimized  for clarity
 rather then speed --  are good: on an Intel(R) Core(TM)  i5-6200U CPU @ 2.30GHz,
@@ -2184,14 +2184,14 @@ We give here the complete code that allows to run a $\ploc$ client.
     <<datum>>
 
 
-    (define (make-ploc n N V c H value-size read-value write-value!
+    (define (make-ploc n B V c H value-size read-value write-value!
                        ;; Tree dependencies.
                        G AE-init AE-keygen AE-encrypt AE-decrypt
                        memory-setup memory-read memory-write)
 
       (assert (u8?  c))
       (assert (u64? n))
-      (assert (u64? N))
+      (assert (u64? B))
       (assert (u64? V))
 
       (define datum-size (+ 16 value-size))
@@ -2226,7 +2226,7 @@ We give here the complete code that allows to run a $\ploc$ client.
                   (loop (+ i 1) pos (cons datum data)))))))
 
       (define-values (tree-setup tree-fetch tree-merge)
-        (make-tree N G data->bytes bytes->data
+        (make-tree B G data->bytes bytes->data
                    AE-init AE-keygen AE-encrypt AE-decrypt
                    memory-setup memory-read memory-write))
 

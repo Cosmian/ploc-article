@@ -19,14 +19,14 @@
   (define (datum->value  datum) (vector-ref datum 1))
 
 
-  (define (make-ploc n N V c H value-size read-value write-value!
+  (define (make-ploc n B V c H value-size read-value write-value!
                      ;; Tree dependencies.
                      G AE-init AE-keygen AE-encrypt AE-decrypt
                      memory-setup memory-read memory-write)
 
     (assert (u8?  c))
     (assert (u64? n))
-    (assert (u64? N))
+    (assert (u64? B))
     (assert (u64? V))
 
     (define datum-size (+ 16 value-size))
@@ -61,7 +61,7 @@
                 (loop (+ i 1) pos (cons datum data)))))))
 
     (define-values (tree-setup tree-fetch tree-merge)
-      (make-tree N G data->bytes bytes->data
+      (make-tree B G data->bytes bytes->data
                  AE-init AE-keygen AE-encrypt AE-decrypt
                  memory-setup memory-read memory-write))
 
