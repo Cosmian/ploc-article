@@ -1,5 +1,7 @@
 #+title: All paths lead to the root
+#+options: author:nil
 #+latex_header: \usepackage{tikz}
+#+bibliography: ../ploc-article.bib
 #+latex_header: \renewcommand{\sec}{\textrm{sec}}
 #+latex_header: \newcommand{\msec}{\textrm{msec}}
 
@@ -8,30 +10,80 @@
 [[file:img/e-print.png]]
 
 * Searchable Symmetric Encryption (SSE)
-** How to retrieve data from an adversary server?
+** Retrieving data from a server?
 
-#+begin_src dot  :exports results :file img/db.svg :results replace
+#+begin_src dot  :exports results :file img/db0.svg :results replace
   graph DB_flow {
+          compound=true;
           rankdir = LR;
           client[shape="rectangle"]
           subgraph cluster_server {
-                  label="Adversary Server"
-                  subgraph cluster_DB {
-                          label="Database"
-                          node[shape="cylinder"]
-                          indexes;
-                          storage;
-                  }
+                  label="Server"
+                  database[shape="cylinder"]
           }
           rank="same"
-          client--indexes[label="1. get(label) -> location" minlen=4]
-          client--storage[label="2. get(location) -> data"  minlen=4]
+          client--database[label="get(label) -> data", minlen=4, lhead="cluster_server"]
   }
 #+end_src
 
-Leaks:
-1. the label and the location;
-2. the location and the data.
+For example: label = "name=DUPONT".
+
+| name   | surname | birth date | disease  |
+|--------+---------+------------+----------|
+| DUPONT | Charles |       1971 | diabetes |
+| DUPONT | Marie   |       1988 | cancer   |
+| ...    | ...     |        ... | ...      |
+
+** Retrieving data from a server?
+
+#+begin_quote
+The server knows everything.
+#+end_quote
+
+** Controlling the leakage
+
+#+begin_src dot  :exports results :file img/db-secure-search-0.svg :results replace
+  graph DB_flow {
+          compound=true;
+          rankdir = LR;
+          client[shape="rectangle"]
+          subgraph cluster_server {
+                  label="Adversary Server\n\n??\n"
+                  database[shape="cylinder", label="Encrypted Database"]
+          }
+          rank="same"
+          client--database[label="get(label) -> encrypted data", minlen=4, lhead="cluster_server"]
+  }
+#+end_src
+
+\vfill
+
+#+begin_quote
+Encrypting the whole database breaks keyword search.
+#+end_quote
+
+\vfill
+
+** Controlling the leakage
+
+#+begin_src dot  :exports results :file img/db1.svg :results replace
+  graph DB_flow {
+          compound=true;
+          rankdir = LR;
+          client[shape="rectangle"]
+          subgraph cluster_server {
+                  label="Server"
+                  subgraph cluster_DB {
+                          label="Database"
+                          node[shape="cylinder"]
+                          indexes[label="\nindexes\n\nget(label)->location"];
+                          storage[label="\nstorage\n\nget(location)->data"];
+                  }
+          }
+          rank="same"
+          client--indexes[label="get(label) -> data", minlen=4, lhead="cluster_server"]
+  }
+#+end_src
 
 ** Controlling the leakage
 
@@ -55,8 +107,8 @@ Leaks:
 #+end_src
 
 Leaks:
-1. $\mathcal L_{SSE}(label)$;
-2. $\mathcal L_{SE}(location)$.
+1. $\mathcal L_{SSE}(Search, label)$;
+2. $\mathcal L_{SE}(Search, location)$.
 
 ** Supporting dynamic states
 
@@ -122,7 +174,7 @@ Leaks:
 *Index STE*:
 - /States/: $\mathbb{K}^{\mathbb{L}^{\mathbb{V}^*}}$
 - /Operations/:
-  - Setup  :: ~:: () -> (key * IO ())~
+  - Setup  :: ~:: () -> IO key~
   - Search :: ~:: key -> label -> IO (Set value)~
   - Insert :: ~:: key -> label -> value -> IO ()~
 
@@ -137,77 +189,55 @@ Leaks:
 *MM STE*:
 - /States/: $\mathbb{K}^{\mathbb{L}^{\mathbb{V}^*}}$
 - /Operations/:
-  - Setup  :: ~:: () -> (key * IO ())~
+  - Setup  :: ~:: () -> IO key~
   - Search :: ~:: key -> label -> IO (List value)~
   - Insert :: ~:: key -> label -> value -> IO ()~
 
 ** Multi-Map STE to Index STE transformation
 
-- Index setup and search are the very MM operations:
   #+begin_example
-  Index::setup  = MM::setup
-  Index::insert = MM::insert
-  #+end_example
-- The result of an Index search is the result of the MM search without
-  duplicates:
-  #+begin_example
-  Index::search = unique . MM::search
-                  where
-                    unique vs = fold Set::insert
-                                     EmptySet vs
+    Index::setup  = MM::setup
+    Index::insert = MM::insert
+    Index::search = unique . MM::search
+                    where
+                      unique = fold Set::insert EmptySet
   #+end_example
 
 * Why bother implementing a more constrained ADT?
 ** Semi-dynamic MM to fully-dynamic MM transformation
 
 *Associative ADT*:
-
-/States/: $\mathbb{L}^{ \mathbb{T}(\mathbb{V})}$
-
-/Operations/:
-- Search :: ~:: s -> l -> T v~
-- Mutate :: ~:: (Mutation M) => s -> l -> M T v -> ()~
-
-  where:
-  #+begin_example
-    class (Container T) => Mutation T v where
-      apply :: v -> (T v) -> (T v)
-  #+end_example
+- /States/: $\mathbb{L}^{ \mathbb{T}(\mathbb{V})}$
+- /Operations/:
+  - Search :: ~:: s -> l -> T v~
+  - Mutate :: ~:: s -> l -> (T v -> T v) -> ()~
 
 ** Semi-dynamic MM to fully-dynamic MM transformation
 
 The fully-dynamic Multi-Map is an associative ADT:
-- Insertion:
-  #+begin_example
-  instance Mutation (MMInsertion List value) where
-    (apply) = (Cons)
-  #+end_example
-- Deletion:
-  #+begin_example
-  instance Mutation (MMDeletion List value) where
-    (apply) = (remove)
-              where
-                remove v []    = []
-                remove v [v l] = remove v l
-                remove v [w l] = Cons w (remove v l)
-  #+end_example
+#+begin_example
+  MM::Search s l v ~ Search s l v
+  MM::Insert s l v ~ Mutate s l (Cons v)
+  MM::Delete s l v ~ Mutate s l (remove v)
+                     where
+                       remove v []    = []
+                       remove v [v l] = remove v l
+                       remove v [w l] = Cons w (remove v l)
+#+end_example
 
 ** Semi-dynamic MM to fully-dynamic MM transformation
 
 #+begin_quote
-Specialized mutations are ~T~ transformations[fn::More precisely, they form a
-monoid and can therefore be reduced.]:
-
-all we need is to log them!
+Mutations  are  composable[fn::More  precisely,  they  form  a  monoid  and  can
+therefore be reduced.]: all we need is to log them!
 #+end_quote
 \vspace{1em}
 
 *Journaling Multi-Map ADT*:
 - /States/: $\mathbb L^{(\mathbb T(\mathbb V)^{\mathbb{T}(\mathbb{V})})^*}$
 - /Operations/:
-  + Search :: ~state -> l -> List (Tx T v)~
-  + Insert :: ~state -> l -> (Tx T v) -> ()~
-  where ~Tx T v = T v -> T v~.
+  + Search :: ~state -> l -> List (T v -> T v)~
+  + Insert :: ~state -> l -> (T v -> T v) -> ()~
 
 ** Semi-dynamic MM to fully-dynamic MM transformation
 
@@ -232,18 +262,26 @@ mutate s l m v = MM::insert s l (m v)
 * \textsc{PLOC} is actually /simple/!
 ** Challenge
 
-1. Do not to leak anything during insertion: $\mathcal L(Insert, label, value) =
-   \bot$ \vspace{2em}
+*MM STE*:
+- /States/: $\mathbb{K}^{\mathbb{L}^{\mathbb{V}^*}}$
+- /Operations/:
+  - Setup  :: ~:: () -> IO key~
+  - Search :: ~:: key -> label -> IO (List value)~
+  - Insert :: ~:: key -> label -> value -> IO ()~
+  \vspace{1em}
 
+*Objectives*:
+1. Do not to leak anything during insertion: $\mathcal L(Insert, label, value) =
+   \bot$
 2. Only leak a (meaningless) UID of the label: $\mathcal L(Search, label) =
    \mathrm{sp}$
 
 ** Search
 
 Simply derive the set of target branches:
-- $\mathrm{PRF}(key, cat, 0) = 3 = \mathtt{b011}$
-- $\mathrm{PRF}(key, cat, 1) = 2 = \mathtt{b010}$
-- $\mathrm{PRF}(key, cat, 2) = 6 = \mathtt{b110}$
+- $\mathrm{PRF}(key, cat, 0) = 3 \mod 8 = \mathtt{b...011}$
+- $\mathrm{PRF}(key, cat, 1) = 2 \mod 8 = \mathtt{b...010}$
+- $\mathrm{PRF}(key, cat, 2) = 6 \mod 8 = \mathtt{b...110}$
 
 Mind the endianness!
 
@@ -496,20 +534,37 @@ $t=2$ & $t=3$
 ** Insert -- Compaction
 
 #+begin_quote
-Can the compaction prevent tree overflow?
+Can the compaction prevent tree overflow? \newline
+#+end_quote
+
+** Insert -- Compaction
+
+#+begin_quote
+Can the compaction prevent tree overflow? \newline
+*yes* (but hard to prove)
 #+end_quote
 
 ** Conclusion -- \textsc{ploc} is /injection-secure/
+
+\vfill
 
 - $\mathcal{L}(Search, label) = \{target\text{-}branch\}$
 
 - $\mathcal{L}(Insert, label, value) = \bot$
 
+\vfill
+
+#+begin_quote
+Complete decorrelation of mutations and their effects!
+#+end_quote
+
+\vfill
+
 ** Conclusion -- \textsc{ploc} is /efficient/
 
 \vfill
 
-With a /simple/ implementation:
+With a /simple/ implementation[fn::Less than 400LoC!]:
 
 \vfill
 
@@ -531,13 +586,20 @@ With a /simple/ implementation:
 
 \vfill
 
+** Conclusion -- \textsc{ploc} is /state-of-the-art/
+
+#+begin_quote
+Only FIX[fn::AC:AmjKamMoa23] achieves the same security properties... but not
+the same efficiency!
+#+end_quote
+
 * Future works
 ** Can we improve the performance?
 
 - Search performance is in $O(V)$:
   - can we store more than one datum per target branch? $\Rightarrow
     O(\frac{V}{m})$
-    \newline
+    \vspace{2em}
 
 - Search bandwidth is in $O(c \lg B)$:
   - can we reduce the depth by $\lg c$? $\Rightarrow O(\lg B)$
@@ -572,7 +634,7 @@ Reliance on an synchronized mutable state due to:
   + what is the impact on performance?
     \newline
     \vspace{1em}
-- Use an independent scheme with no leakage?
+- Use an independent scheme with no leakage (ORAM)?
   + with what performances?
     \newline
   + can it be compatible with concurrent queries?
@@ -585,7 +647,7 @@ Reliance on an synchronized mutable state due to:
 
     *Big* due to volume-hiding
     \vspace{1em}
-- Use an independent scheme with no leakage?
+- Use an independent scheme with no leakage (ORAM)?
   + with what performances?
     \newline
   + can it be compatible with concurrent queries?
@@ -598,7 +660,7 @@ Reliance on an synchronized mutable state due to:
 
     *Big* due to volume-hiding
     \vspace{1em}
-- Use an independent scheme with no leakage?
+- Use an independent scheme with no leakage (ORAM)?
   + with what performances?
 
     *OK* $O(\log N)$
@@ -612,7 +674,7 @@ Reliance on an synchronized mutable state due to:
 
     *Big* due to volume-hiding
     \vspace{1em}
-- Use an independent scheme with no leakage?
+- Use an independent scheme with no leakage (ORAM)?
   + with what performances?
 
     *OK* $O(\log N)$
