@@ -2,5 +2,6 @@
 *.log
 ploc-article-blx.bib
 ploc-article.bbl
-ploc-article.tex
+./ploc-article.tex
 tmp/*
+**/_minted
