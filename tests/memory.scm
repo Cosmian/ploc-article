@@ -23,7 +23,7 @@
 
     (define (read as)
       (assert-initialized)
-      (map (lambda (a) (hashtable-ref m a 'free))
+      (map (lambda (a) (hashtable-ref m a '()))
 	   as))
 
     (define (write bs)

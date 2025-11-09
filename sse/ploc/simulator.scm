@@ -12,13 +12,12 @@
 
   (define (psi-search label-idx)
     (let* ((targets (map (λ (v) (PRF label-idx v)) (iota V)))
-           (subtree (phi 'fetch targets)))
+           (subtree (phi 'select targets)))
       (values)))
 
   (define (psi-insert)
-    (let ((targets (scheduler)))
-      (phi 'fetch targets)
-      (phi 'merge targets)))
+    (phi 'mutate (scheduler))
+    (values))
 
   (λ (op . args)
     (match op

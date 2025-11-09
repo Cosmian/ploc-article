@@ -50,12 +50,13 @@
 (define (data->bytes data)
   (let ((bytes (make-bytevector 5 0)))
     (match data
-      (()      bytes)
+      (()  bytes)
       ((n) (begin
              (write-u8!  bytes 0 1)
              (write-u32! bytes 1 (car data))
              bytes))
       (_ (error data->bytes "incorrect number of datum" data)))))
+
 
 (define (bytes->data bytes)
   (let ((len (read-u8 bytes 0)))
@@ -64,41 +65,42 @@
         (list (read-u32 bytes 1)))))
 
 
-(define (G node-id depth)
-  "Returns a 128-bit non-cryptographic hash of the given node ID and depth."
-  (+ (<< (equal-hash node-id) 8)
-     (equal-hash depth)))
+(define (G depth target)
+    "Returns a 128-bit non-cryptographic hash of the given depth and branch."
+    (+ (<< depth 64) target))
 
-(define (make-test-tree N data->bytes bytes->data)
+
+(define (make-test-tree D data->bytes bytes->data)
   (define-values (memory-setup memory-read memory-write . _)
     (in-memory))
-  (make-tree N G data->bytes bytes->data
+  (make-tree D G data->bytes bytes->data
              aes-gcm-256:init aes-gcm-256:keygen
              aes-gcm-256:encrypt aes-gcm-256:decrypt
              memory-setup memory-read memory-write))
 
-(define (test-tree N)
-  (define-values (tree-setup tree-fetch tree-merge)
-    (make-test-tree N data->bytes bytes->data))
+
+(define (test-tree D)
+  (define-values (tree-setup tree-fetch tree-mutate)
+    (make-test-tree D data->bytes bytes->data))
+
+  (define N (<< 1 D))
 
   (define key (tree-setup))
 
   (define tree (tree-fetch key (iota N)))
 
-  (define expected-depth (lg N))
-
-  (assert (= (tree-depth tree) expected-depth))
+  (assert (= (tree-depth tree) D))
 
   ;; Fills the entire the tree with zeros.
-  (tree-merge key
-              (tree-map (const (list 0))
-                        (tree-fetch key (iota N))))
+  (tree-mutate key (iota N)
+               (λ (tree) (tree-map (const (list 0)) tree)))
+
 
   ;; Enumerates each node of the left part of the tree.
-  (tree-merge key
-              (tree-map (let ((counter (make-counter)))
-                          (compose list counter))
-                        (tree-fetch key (filter even? (iota N)))))
+  (tree-mutate key (filter even? (iota N))
+               (λ (tree) (tree-map (let ((counter (make-counter)))
+                                     (compose list counter))
+                                   tree)))
 
   ;; Reads the entire tree to check the results.
   (define tree-data (tree->data (tree-fetch key (iota N))))

@@ -12,11 +12,9 @@
           (srfi :11))
 
 
-  (define (new-datum target value)
-    (vector target value))
-  
-  (define (datum->target datum) (vector-ref datum 0))
-  (define (datum->value  datum) (vector-ref datum 1))
+  (define (datum value target)  (pair value target))
+  (define (datum->value  datum) (car datum))
+  (define (datum->target datum) (cdr datum))
 
 
   (define (make-ploc n B V c H value-size read-value write-value!
@@ -39,7 +37,7 @@
     (define (read-datum bytes pos)
       (let*-values (((target pos) (read-u128  bytes pos))
                     ((value  pos) (read-value bytes pos)))
-        (values (new-datum target value)
+        (values (datum value target)
                 pos)))
 
     (define (data->bytes data)
@@ -58,23 +56,24 @@
           (if (= i len)
               data
               (let-values (((datum pos) (read-datum bytes pos)))
-                (loop (+ i 1) pos (cons datum data)))))))
+                (loop (+ i 1) pos (pair datum data)))))))
 
-    (define-values (tree-setup tree-fetch tree-merge)
-      (make-tree B G data->bytes bytes->data
-                 AE-init AE-keygen AE-encrypt AE-decrypt
-                 memory-setup memory-read memory-write))
+    (define-values (tree-setup tree-select tree-mutate)
+      (let ((D (inexact->exact (ceiling (lg B)))))
+        (make-tree D G data->bytes bytes->data
+                   AE-init AE-keygen AE-encrypt AE-decrypt
+                   memory-setup memory-read memory-write)))
 
     (define scheduler (make-scheduler n))
 
-    (define volumes (make-hmap))
+    (define volumes (hash-map))
     
     (define (get-volume label)
-      (hmap-find volumes label 0))
+      (hash-map-find volumes label 0))
     
     (define (increment-volume label)
       (let ((volume (get-volume label)))
-        (hmap-bind! volumes label (+ volume 1))))
+        (hash-map-bind! volumes label (+ volume 1))))
 
     (define (get-target key label volume)
       (H key label volume))
@@ -82,16 +81,20 @@
     (define (make-datum key label value)
       (let* ((volume (get-volume label))
              (target (get-target key label volume)))
-        (new-datum target value)))
+        (datum value target)))
 
     (define (get-all-targets key label)
       (map (λ (v) (get-target key label v))
            (iota V)))
 
-    (define (find-data subtree target)
-      (define (matching-datum? datum)
-        (= (datum->target datum) target))
-      (filter matching-datum? (branch-data subtree target)))
+    (define (tree-data tree)
+      (define (index-datum mm datum)
+        (let ((value  (datum->value  datum))
+              (target (datum->target datum)))
+          (hash-map-bind! mm target value)))
+      (define (index-data mm data)
+        (foldl index-datum mm data))
+      (tree-dfs index-data (hash-map) tree))
 
     (define (compact node depth data)
       (define (left-datum? datum)
@@ -105,31 +108,31 @@
               ((l-child l-data) (compact l-child (+ depth 1) l-data))
               ((r-child r-data) (compact r-child (+ depth 1) r-data))
               ((node-data rest) (take c (append l-data r-data))))
-           (values (make-node node-data l-child r-child) rest)))
-        (_ (values node data))))
+           (values (new-node node-data l-child r-child) rest)))
+        (() (values (list) data))))
 
     (define (ploc-setup) (tree-setup))
 
     (define (ploc-insert key label value)
-      (let ((data    (list (make-datum key label value)))
-            (subtree (tree-fetch key (scheduler))))
-        (let-values (((subtree data) (compact subtree 0 data)))
-          (unless (null? data)
-            (error "tree overflow" subtree label value))
-          (increment-volume label)
-          (tree-merge key subtree))))
+      (let* ((data (list (make-datum key label value)))
+             (tx   (λ (tree)
+                     (call-with-values (λ () (compact tree 0 data))
+                       (λ (tree overflow)
+                         (if (null? overflow)
+                             tree
+                             (error ploc-insert "compaction overflow"
+                                    label value tree overflow)))))))
+        (tree-mutate key (scheduler) tx)
+        (increment-volume label)))
 
     (define (ploc-search key label)
-      (let* ((targets  (get-all-targets key label))
-             (subtree  (tree-fetch key targets)))
+      (let* ((targets (get-all-targets key label))
+             (subtree (tree-select key targets))
+             (values  (tree-data subtree)))
         (reverse
-         (foldl (λ (result target)
-                  (match (find-data subtree target)
-                    (()      result)
-                    ((datum) (cons (datum->value datum) result))
-                    ( data   (error ploc-search
-                                    "more than one datum found"
-                                    data))))
+         (foldl (λ (acc target)
+                  (let ((value (hash-map-find values target #f)))
+                    (if value (pair value acc) acc)))
                 (list)
                 targets))))
 

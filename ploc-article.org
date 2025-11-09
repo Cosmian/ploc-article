@@ -9,9 +9,12 @@
 
 #+latex_class_options: [9pt,a4paper]
 
+#+cite_export: biblatex numeric,backend=bibtex
 #+bibliography: ./ploc-article.bib
 
 #+latex_header: \author{Théophile Brézot \thanks{Cosmian: theophile.brezot@cosmian.com} \and Chloé Hébant \thanks{Cosmian: chloe.hebant@cosmian.com}}
+
+#+latex_header: \setminted{style=bw}
 
 #+latex_header: \usepackage{tikz}
 #+latex_header: \usepackage{tikz-qtree}
@@ -30,6 +33,8 @@
 #+latex_header: \newcommand{\Fetch}{\mathrm{Fetch}}
 #+latex_header: \newcommand{\Insert}{\mathrm{Insert}}
 #+latex_header: \newcommand{\Merge}{\mathrm{Merge}}
+#+latex_header: \newcommand{\Mutate}{\mathrm{Mutate}}
+#+latex_header: \newcommand{\Select}{\mathrm{Select}}
 #+latex_header: \newcommand{\Search}{\mathrm{Search}}
 #+latex_header: \newcommand{\Setup}{\mathrm{Setup}}
 #+latex_header: \newcommand{\ploc}{\text{\textsc{ploc}}}
@@ -334,6 +339,7 @@ to quantify the information leaked to  the adversary by each operation.  In this
 work, we consider the notion  of adaptive security against a honest-but-curious,
 polynomial-time server.
 
+#+attr_latex: :options [Adaptive Security]
 #+begin_definition
 An STE scheme $\Sigma$ is said to be \(\cL\)-adaptively-secure if there exists a
 simulator $\phi$  such that  for any  stateful honest-but-curious  PPT adversary
@@ -423,8 +429,7 @@ table [[table:notations]].
 |   | $\psi$   | $\ploc$ simulator                          |
 |---+----------+--------------------------------------------|
 
-* Description
-** $\ploc$
+* $\ploc$
 
 The complete  algorithm is given  in appendix [[The $\ploc$ scheme]][fn::It  is also
 available as a [[https://github.com/Cosmian/ploc-article][Github repository]].]. We have chosen to implement it in the Scheme
@@ -445,61 +450,89 @@ assumed that the following names are in scope:
   key,  a label  bit-string of  arbitrary size  and an  integer, and  produces a
   128-bit   integer.   Its  only   required   security   guarantee  is   to   be
   indistinguishable from a pseudo-random function;
-Since $\ploc$  is based on  a complete binary tree  of $N$ leaves,  we introduce
-here  some vocabulary  used to  describe trees.   A /branch/  is defined  as the
-bit-string representing  the choices to be  made at each level  between the left
-and the right child of a node. This bit-string is encoded as an integer in which
-the choice made at the root is encoded by the bit of exponent zero.  This choice
-of representation  allows for  efficient and simple  tree traversals.   A branch
-needs not be  smaller that $N$ since  the bits following the first  $\lg N$ ones
-are ignored by  the traversal.  This allows  using the output of  ~H~ as branch.
-The /ID/ of a given node at depth $d$  is the prefix of length $d$ of any branch
-to which  this node  belongs: it  is therefore  the bit-string  representing the
-sequence of choices made at each level from the root to that node, encoded as an
-integer the same way a branch is.
 
-To manipulate  this complete binary  tree, $\ploc$  relies on a  \((s, N)\)-tree
-encryption  scheme  which  is   formally  defined  in  section [[*Tree  Encryption
-Scheme]]. This scheme exposes the following operations:
-- ~(tree-setup)~ creates  a server-side  encrypted complete  binary tree  of ~N~
-  leaves and returns a freshly generated key;
-- ~(tree-fetch key branches)~ returns the  subtree defined by the given branches
-  from the main tree;
-- ~(tree-merge key  subtree)~ merges  the given  subtree with  the main  tree by
-  replacing all the main-tree branches by their equivalent subtree branches.
 
-*** Setup procedure
+In  order  to   store  and  encrypt  its  data,  $\ploc$   relies  on  an  \((s,
+D)\)-binary-tree encryption scheme which, for the sake of this article, is based
+on the abstract data type defined as follows:
+#+attr_latex: :options [\((s, D)\) Binary Tree]
+#+begin_definition
+An \((s, D)\) binary tree is an  abstract data type parameterized by a node size
+$s$ and a depth  $D$, which valid states are the binary trees  of depth $D$ with
+nodes  that are  isomorphic  to \(s\)-long  byte strings  (i.e.  tree nodes  are
+serializable  to  \(s\)-long  byte  strings), and  that  exposes  the  following
+operations:
+- $\Select(\{b_i\})$ that returns the subtree defined by the branches $\{b_i\}$;
+- $\Mutate(\{b_i\},  tx)$  that mutates  the  subtree  defined by  the  branches
+  $\{b_i\}$ by replacing it by its image by the transformation $tx$ on it, which
+  should be a function  that takes as argument a tree and returns  a tree of the
+  same shape.
+#+end_definition
 
-The setup simply consists in initializing the server-side tree used by $\ploc$:
+Where a /branch/ is defined as a  bit string representing the choices to be made
+at each level between  the left and right children of a  node.  Such bit strings
+are encoded as integers  in which the choice made at the root  is encoded by the
+bit of  exponent zero.  This choice  of representation allows for  efficient and
+simple tree traversals.  The number of bits in a branch needs not be smaller the
+tree depth  since the additional  bits can simply  be ignored by  the traversal.
+This allows using the output of ~H~ as branch.
+#+name: branch-utils
+#+begin_src scheme
+  (define (node-id  depth branch) (&& branch (- (<< 1 depth) 1)))
+  (define (go-left  depth branch)    branch)
+  (define (go-right depth branch) (+ branch (<< 1 depth)))
+  (define (go-left? depth branch) (zero? (&& branch (<< 1 depth))))
+#+end_src
+
+An  \((s, D)\)-binary-tree  encryption  scheme therefore  exposes the  following
+operations:
+- ~(tree-setup)~ creates a  server-side encrypted complete binary  tree of depth
+  ~D~ and returns a freshly generated key;
+- ~(tree-select  key  branches)~  returns  the  subtree  defined  by  the  given
+  branches;
+- ~(tree-mutate  key subtree  tx)~  mutates  the subtree  defined  by the  given
+  branches using the given transformation.
+Additionally, we suppose in the following sections that the subtrees returned by
+this scheme are made of nodes that  are either a vector containing the node data
+and its left and right children and sentinel nodes represented by the empty list
+are used to make processing the tree easier.
+#+name: node-constructors
+#+begin_src scheme
+  (define (new-node data lnode rnode) (vector data lnode rnode))
+  (define (sentinel)                  (list))
+#+end_src
+
+** Setup procedure
+
+The   setup  simply   consists  in   calling   the  setup   of  the   underlying
+\((s,D)\)-binary-tree encryption scheme:
 #+name: ploc-setup
 #+begin_src scheme
   (define (ploc-setup) (tree-setup))
 #+end_src
 
-*** Insertion procedure
+** Insertion procedure
 
 In $\ploc$ as in most SSE, inserting requires the client to store the volumes of
 each label. This can be done using a hash-map:
 #+name: volume-helpers
 #+begin_src scheme
-  (define volumes (make-hmap))
+  (define volumes (hash-map))
 
   (define (get-volume label)
-    (hmap-find volumes label 0))
+    (hash-map-find volumes label 0))
 
   (define (increment-volume label)
     (let ((volume (get-volume label)))
-      (hmap-bind! volumes label (+ volume 1))))
+      (hash-map-bind! volumes label (+ volume 1))))
 #+end_src
 Each binding  is stored  wrapped inside  a /datum/ that  holds both  the indexed
-value, and a branch index called /target/.
+value, and a branch called /target/.
 #+name: datum
 #+begin_src scheme
-  (define (new-datum target value)
-    (vector target value))
-
-  (define (datum->target datum) (vector-ref datum 0))
-  (define (datum->value  datum) (vector-ref datum 1))
+  (define (datum value target)  (pair value target))
+  (define (datum->value  datum) (car datum))
+  (define (datum->target datum) (cdr datum))
 #+end_src
 The target is a pseudo-random number computed using the cryptographic hash ~H~
 and the ~key~.
@@ -513,25 +546,23 @@ and the ~key~.
   (define (make-datum key label value)
     (let* ((volume (get-volume label))
            (target (get-target key label volume)))
-      (new-datum target value)))
+      (datum value target)))
 #+end_src
 Storing  the  target  branch  in  each datum  enables  future  modifications  to
 /compact/ the  tree while maintaining the  invariant (*I*) each datum  is on its
 target branch, and the post-condition (*P*) no datum can be pushed further down.
 
-The compaction is performed on a subtree  extracted from the main tree using the
-~tree-fetch~ procedure.  The branches used  to select this subtree are generated
+The compaction  is performed  on a  subtree of $n$  branches that  are generated
 using  a  procedure  of  no  argument called  a  /scheduler/.   Some  scheduling
-strategies are better than others.  Indeed, if  the same set of branches were to
-be constantly scheduled for compaction, the  datums which target branches have a
+strategies  are better  than others:  if the  same set  of branches  were to  be
+constantly scheduled  for compaction,  the datums which  target branches  have a
 small intersection with  this set of branches would accumulate  near the root of
-the tree, eventually causing  an overflow when no space can be  found to place a
-new  datum. We  therefore  choose a  scheduling strategy  that  sweeps the  tree
-branches in  a regular and  uniform way:  the lower bits  are all covered  by at
-least  one of  the branches  and  each branch  covers  the remaining  bits in  a
-circular fashion.
+the  tree, eventually  causing an  overflow.  We  therefore choose  a scheduling
+strategy that sweeps the  tree branches in a regular and  uniform way: the lower
+bits are all covered by at least one  of the branches and each branch covers the
+remaining bits in a circular fashion.
 #+begin_export latex
-For example with $N=8$ and $n=2$, the two upper-most levels representing the two
+For example with $D=3$ and $n=2$, the two upper-most levels representing the two
 lowest bits are all covered. Then, at each call to the scheduler, these bits are
 prepended the  bits generated by  selecting the  next integer, resulting  in the
 subtrees depicted in  Figure \ref{fig:scheduling}.
@@ -552,11 +583,11 @@ $t=0$ & $t=1$
 $t=2$ & $t=3$
 \\
 \end{tabular}
-\caption{Scheduled subtrees for $N=8$ and $n=2$.\label{fig:scheduling}}
+\caption{Scheduled subtrees for $D=3$ and $n=2$.\label{fig:scheduling}}
 \end{figure}
 #+end_export
 #+begin_export html
-<p>For example with \(N=8\) and  \(n=2\), the two upper-most levels representing
+<p>For example with \(D=3\) and  \(n=2\), the two upper-most levels representing
 the two lowest bits are all covered.  Then, at each call to the scheduler, these
 bits are prepended  the bits generated by selecting the  next integer, resulting
 in these subtrees:</p>
@@ -592,7 +623,7 @@ procedure.
     (let loop ((n n) (xs xs) (taken (list)))
       (if (or (zero? n) (null? xs))
           (values taken xs)
-          (loop (- n 1) (cons (head xs) taken) (tail xs)))))
+          (loop (- n 1) (pair (head xs) taken) (tail xs)))))
 #+end_src
 At each  level, to tell  apart data targeting the  left and right  subtrees, the
 procedure ~(split-with pred? xs)~ is used.  It returns two lists: one containing
@@ -603,16 +634,9 @@ values that match the given predicate and one containing those that don't.
     (let loop ((xs xs) (lhs (list)) (rhs (list)))
       (match xs
         ((x . xs) (if (pred? x)
-                      (loop xs (cons x lhs) rhs)
-                      (loop xs lhs (cons x rhs))))
+                      (loop xs (pair x lhs) rhs)
+                      (loop xs lhs (pair x rhs))))
         (()       (values lhs rhs)))))
-#+end_src
-The predicate  ~(go-left? depth branch)~  returns whether the choice  encoded at
-the given depth in the given branch is to select the left child.
-#+name: go-left?
-#+begin_src scheme
-  (define (go-left? depth branch)
-    (zero? (&& (<< 1 depth) branch)))
 #+end_src
 #+name: compact
 #+begin_src scheme
@@ -628,8 +652,8 @@ the given depth in the given branch is to select the left child.
             ((l-child l-data) (compact l-child (+ depth 1) l-data))
             ((r-child r-data) (compact r-child (+ depth 1) r-data))
             ((node-data rest) (take c (append l-data r-data))))
-         (values (make-node node-data l-child r-child) rest)))
-      (_ (values node data))))
+         (values (new-node node-data l-child r-child) rest)))
+      (() (values (list) data))))
 #+end_src
 The preservation  of the invariant *I*,  can be proven by  recurrence by showing
 that a  datum is  accumulated up  to the last  node in  the intersection  of its
@@ -647,16 +671,19 @@ a truly random subtree with this datum.
 #+name: ploc-insert
 #+begin_src scheme
   (define (ploc-insert key label value)
-    (let ((data    (list (make-datum key label value)))
-          (subtree (tree-fetch key (scheduler))))
-      (let-values (((subtree data) (compact subtree 0 data)))
-        (unless (null? data)
-          (error "tree overflow" subtree label value))
-        (increment-volume label)
-        (tree-merge key subtree))))
+    (let* ((data (list (make-datum key label value)))
+           (tx   (λ (tree)
+                   (call-with-values (λ () (compact tree 0 data))
+                     (λ (tree overflow)
+                       (if (null? overflow)
+                           tree
+                           (error ploc-insert "compaction overflow"
+                                  label value tree overflow)))))))
+      (tree-mutate key (scheduler) tx)
+      (increment-volume label)))
 #+end_src
 
-*** Search procedure
+** Search procedure
 
 The search  procedure is much simpler:  it fetches the subtree  generated by all
 branches possibly targeted by values indexed under the searched label,
@@ -666,223 +693,64 @@ branches possibly targeted by values indexed under the searched label,
     (map (λ (v) (get-target key label v))
          (iota V)))
 #+end_src
-and for  each target branch,  filters out data  that doesn't target  the correct
-label.
-#+name: find-data
-#+begin_src scheme
-  (define (find-data subtree target)
-    (define (matching-datum? datum)
-      (= (datum->target datum) target))
-    (filter matching-datum? (branch-data subtree target)))
-#+end_src
-Only  one datum  per  target  should be  found  since  ~target~ contains  enough
-entropy.
+and retrieves the data targeting the same target branches:
 #+name: ploc-search
 #+begin_src scheme
   (define (ploc-search key label)
-    (let* ((targets  (get-all-targets key label))
-           (subtree  (tree-fetch key targets)))
+    (let* ((targets (get-all-targets key label))
+           (subtree (tree-select key targets))
+           (values  (tree-data subtree)))
       (reverse
-       (foldl (λ (result target)
-                (match (find-data subtree target)
-                  (()      result)
-                  ((datum) (cons (datum->value datum) result))
-                  ( data   (error ploc-search
-                                  "more than one datum found"
-                                  data))))
+       (foldl (λ (acc target)
+                (let ((value (hash-map-find values target #f)))
+                  (if value (pair value acc) acc)))
               (list)
               targets))))
 #+end_src
-
-** Tree Encryption Scheme
-
-$\ploc$  relies on  a  \((s, N)\)-Tree  STE scheme,  defined  as the  structured
-encryption scheme  based on the  ADT parameterized by  $s$ and $N$,  which valid
-states are the  complete binary trees of  $N$ leaves and nodes of  size $s$, and
-which operations are:
-- $(t, T')  \gets \Fetch(\mathrm{branches},  T)$, that  returns the  subtree $t$
-  defined by the given branches in $T$;
-- $(\bot, T')  \gets \Merge(t, T)$  that merges the  given subtree $t$  with the
-  tree $T$ by replacing  all tree nodes by their equivalent  in the subtree when
-  it exists.
-The present section describes an  implementation of this scheme for completeness
-only: since  it is used as  a black-box by $\ploc$,  and in order to  reduce the
-length of the present article, the  security proof of this implementation is not
-given.  Following  the design  choices discussed  in [cite:@EPRINT:BreHeb24], we
-rely on  a server abstraction  exposing a linear  128-bit memory space  with the
-following operations:
-- ~(memory-setup)~ initializes a new server-side abstraction of a 128-bit linear
-  memory space;
-- ~(memory-read addresses)~  atomically reads  from given addresses  and returns
-  the list  of words bound  to these addresses, or  the special value  ~free~ in
-  case no word was found;
-- ~(memory-write bindings)~ atomically writes the given bindings to memory.
-Additionally, the present implementation  depends on an authenticated encryption
-scheme like AES256-GCM.
-
-*** Tree representation
-
-A tree node is represented as a vector containing its data and a pointer to both
-its children.
-#+name: make-node
+where ~tree-data~  is the procedure using a depth-first search:
+#+name: tree-dfs
 #+begin_src scheme
-  (define (make-node data l-child r-child)
-    (vector data l-child r-child))
-
-  (define (node->data    node) (vector-ref node 0))
-  (define (node->l-child node) (vector-ref node 1))
-  (define (node->r-child node) (vector-ref node 2))
-#+end_src
-In order to fit  a tree into a linear memory, we need  to associate each node to
-an address. We choose  to index each node using the  pair ~(depth node-id)~. The
-node ID of the root is 0, and subsequent node IDs may be computed as follows:
-#+name: node-id-helpers
-#+begin_src scheme :noweb-ref
-  (define (l-child-id node-id) (+ (<< node-id 1) 0))
-  (define (r-child-id node-id) (+ (<< node-id 1) 1))
-
-  (define (next-node-id node-id depth target)
-    (if (go-left? depth target)
-        (l-child-id node-id)
-        (r-child-id node-id)))
-#+end_src
-Computing  the address  of  a  node therefore  simply  consists  in hashing  its
-associated ~(dept node-id)~ onto 128 bits  using the hash function ~G~, which is
-only required to have a good-enough collision resistance.
-#+name: make-address
-#+begin_src scheme
-  (define (make-address node-id depth) (G node-id depth))
-#+end_src
-Finally, we  can write helpers to  flatten a tree into  bindings and vice-versa.
-The  ~tree->bindings~ procedure  takes as  argument  a tree  and a  ~data->word~
-procedure, and returns a list of memory bindings encoding this tree.
-#+name: tree->bindings
-#+begin_src scheme
-  (define (tree->bindings tree data->word)
-    (let loop ((node tree) (node-id 0) (depth 0))
+  (define (tree-dfs f acc root)
+    (let loop ((node root) (acc acc))
       (match node
         (#(data l-child r-child)
-         (let ((address (make-address node-id depth))
-               (word    (data->word data)))
-           (append (list (cons address word))
-                   (loop l-child (l-child-id node-id) (+ depth 1))
-                   (loop r-child (r-child-id node-id) (+ depth 1)))))
-        (_ (list)))))
+         (loop l-child
+               (loop r-child
+                     (f acc data))))
+        (() acc))))
 #+end_src
-The ~bindings->tree~ procedure  takes as argument ~get-word~,  which returns the
-word bound to the given address, ~free~  if this address is free and ~unread~ if
-this address is not  part of the target set, and  ~word->data~ which returns the
-data encoded by a given word.
-#+name: bindings->tree
+to return a multi-map containing all values stored in the given tree, indexed by
+their target:
+#+name: tree-data
 #+begin_src scheme
-  (define (bindings->tree get-word word->data)
-    (define sentinel (list))
-    (define (unread? word) (eq? word 'unread))
-    (define (free?   word) (eq? word 'free))
-    (let loop ((node-id 0) (depth 0))
-      (let* ((address (make-address node-id depth))
-             (word    (get-word address)))
-        (if (unread? word)
-            sentinel
-            (make-node (if (free? word) (list) (word->data word))
-                       (loop (l-child-id node-id) (+ depth 1))
-                       (loop (r-child-id node-id) (+ depth 1)))))))
-#+end_src
-
-*** Setup
-
-The ~tree-setup~  simply consists  in setting-up a  new server-side  memory, and
-returning  a fresh  AE key.   Not initializing  the tree  avoids a  $O(N)$ setup
-without leaking  any additional  information in the  persistent-adversary model,
-which  is  why  we  designed  the  ~bindings->tree~  operation  to  be  able  to
-distinguish free addresses from unread addresses,  and to consider the former as
-empty nodes.
-#+name: tree-setup
-#+begin_src scheme
-  (define (tree-setup)
-    (memory-setup)
-    (AE-keygen))
-#+end_src
-
-*** Fetch
-
-Fetching simply consists  in deriving the addresses of each  node in the subtree
-defined by  the given leaf  IDs, reading them  from memory, decrypting  them and
-extracting  the data  they contain.  In  order to  derive the  addresses of  the
-subtree,  we  use a  naive  approach  deriving  the  addresses defined  by  each
-branches, adding  them into a  hash-set to  guarantee unicity and  returning the
-list of addresses it contains once the addresses defined by each branch has been
-added to it.
-#+name: subtree-addresses
-#+begin_src scheme
-  (define (subtree-addresses branches)
-    (hset->list
-     (foldl (λ (addresses branch)
-              (foldl hset-add!
-                     addresses
-                     (branch-addresses branch)))
-            (make-hset)
-            branches)))
-#+end_src
-The addresses defined by each branch are derived in a straightforward, recursive
-manner.
-#+name: branch-addresses
-#+begin_src scheme
-  (define (branch-addresses branch)
-    (let loop ((node-id 0) (depth 0))
-      (if (< max-depth depth)
-          (list)
-          (cons (make-address node-id depth)
-                (loop (next-node-id node-id depth branch)
-                      (+ depth 1))))))
-#+end_src
-We can now  write the complete ~tree-fetch~ procedure which  proceeds by reading
-all subtree addresses  from the server, and building the  subtree by recursively
-finding the data corresponding  to each node, from the root.  Note that the call
-to ~hmap-find~ here returns the special value ~unread~.
-#+name: tree-fetch
-#+begin_src scheme
-  (define (tree-fetch key branches)
-    (define AE (AE-init key))
-    (let* ((addresses (subtree-addresses branches))
-           (words     (memory-read addresses))
-           (bindings  (foldl hmap-bind! (make-hmap) addresses words)))
-      (bindings->tree
-       (λ (address) (hmap-find bindings address 'unread))
-       (λ (bytes) (bytes->data (AE-decrypt AE bytes))))))
-#+end_src
-
-*** Merge
-
-Merging a tree simply consists in going through each node and to generate its
-associated binding, and finally to write all the generated bindings server-side.
-
-#+name: tree-merge
-#+begin_src scheme
-  (define (tree-merge key subtree)
-    (define AE (AE-init key))
-    (let ((data->word (λ (data) (AE-encrypt AE (data->bytes data)))))
-      (memory-write (tree->bindings subtree data->word))
-      (values)))
+  (define (tree-data tree)
+    (define (index-datum mm datum)
+      (let ((value  (datum->value  datum))
+            (target (datum->target datum)))
+        (hash-map-bind! mm target value)))
+    (define (index-data mm data)
+      (foldl index-datum mm data))
+    (tree-dfs index-data (hash-map) tree))
 #+end_src
 
 * Security analysis
 
-In this section,  we assume the existence  of a \(\cL_{\tau}\)-adaptively-secure
-\((s, N)\)-tree encryption scheme, where $\cL_\tau$ is defined as follow:
+In this section, we assume  the existence of an \(\cL_{\tau}\)-adaptively-secure
+\((s, D)\)-binary-tree encryption scheme, where $\cL_\tau$ is defined as follow:
 - $\cL_{\tau}(\Setup) = \Setup$;
-- $\cL_{\tau}(\Fetch, \{b_i\}) = (\Fetch, \{b_i\})$;
-- $\cL_{\tau}(\Merge, \mathrm{subtree}) = (\Merge, \{b_i\})$.
-That is, the  tree encryption scheme operations only leak  the branches defining
-the subtree they are working on.  Such  a scheme is actually trivial to designed
-and one possible implementation is described in section [[*Tree Encryption Scheme]].
+- $\cL_{\tau}(\Select, \{b_i\}) = (\Select, \{b_i\})$;
+- $\cL_{\tau}(\Mutate, \{b_i\}, tx) = (\Mutate, \{b_i\})$.
+That is,  these binary-tree-encryption-scheme operations only  leak the branches
+defining the subtree they are working on.   Such a scheme is actually trivial to
+design  as   it  only  requires  nodes   to  be  encrypted,  and   one  possible
+implementation is described in appendix [[*Tree Encryption Scheme]].
 
 #+begin_theorem
-Given a \(\cL_{\tau}\)-adaptively-secure \((s,  N)\)-tree encryption scheme with
-public  parameters  $pp_{\tau}$,  $\ploc$ is  a  \(\cL_{\pi}\)-adaptively-secure
-\((\bbL,\bbV)\)-multi-map encryption scheme  with public parameters $(pp_{\tau},
-c,  n, B,  V)$, where  $s =  c\lg|\bbV|$, $N=B$  and $\cL_{\pi}$  is defined  as
-follows:
+Given  an  \(\cL_{\tau}\)-adaptively-secure  \((s,  D)\)-binary-tree  encryption
+scheme    with     public    parameters     $pp_{\tau}$,    $\ploc$     is    an
+\(\cL_{\pi}\)-adaptively-secure \((\bbL,\bbV)\)-multi-map encryption scheme with
+public parameters $(pp_{\tau},  c, n, B, V)$, where $s  = c\lg|\bbV|$, $D=\lg B$
+and $\cL_{\pi}$ is defined as follows:
 - $\cL_{\pi}(\Setup) = \Setup$
 - $\cL_{\pi}(\Search, \ell) = (\Search, \spattern)$
 - $\cL_{\pi}(\Insert, \ell, v) = \Insert$
@@ -890,8 +758,8 @@ follows:
 
 #+begin_proof
 Given the  domain $\bbL$ and codomain  $\bbV$, the public parameters  $(c, n, B,
-V)$, and a  \(\cL_{\tau}\)-adaptively-secure \((c\lg|\bbV|, B)\)-tree encryption
-scheme   with   public   parameters   $pp_\tau$,  there   exists   a   simulator
+V)$, and an \(\cL_{\tau}\)-adaptively-secure \((c\lg|\bbV|, \lg B)\)-binary-tree
+encryption scheme  with public  parameters $pp_\tau$,  there exists  a simulator
 $\phi_{pp_\tau}$    such    that    $\phi_{pp_\tau}   \circ    \cL_{\tau}$    is
 indistinguishable  from  a  legitimate   tree-encryption-scheme  client  in  the
 security  game given  in  [[*Leakages  and adaptive  security]].   In the  following
@@ -901,14 +769,15 @@ legitimate $\ploc$ client in  the same game.  The full code  of the simulator is
 given in section [[$\ploc$ simulator]].
 #+end_proof
 
-Note that  in the implementation  given in section [[*Tree Encryption  Scheme]], the
-only tree-encryption-scheme public parameter is the encryption overhead.
+Note that  in the implementation of  the binary-tree encryption scheme  given in
+appendix [[*Tree Encryption  Scheme]], the only  public parameter is  the encryption
+overhead.
 
 #+begin_corollary
-Given a \(\cL_{\tau}\)-adaptively-secure \((s,  N)\)-tree encryption scheme with
-public    parameters    $pp_{\tau}$,     $\ploc$    is    an    injection-secure
+Given  an  \(\cL_{\tau}\)-adaptively-secure  \((s,  D)\)-binary-tree  encryption
+scheme  with  public  parameters  $pp_{\tau}$, $\ploc$  is  an  injection-secure
 \((\bbL,\bbV)\)-multi-map encryption scheme  with public parameters $(pp_{\tau},
-c, n, B, V)$, where $s = c\lg|\bbV|$, $N = B$.
+c, n, B, V)$, where $s = c\lg|\bbV|$, $B = \lg B$.
 #+end_corollary
 
 #+begin_proof
@@ -941,65 +810,17 @@ Recall the search operation works as follows:
 
   <<get-all-targets>>
 
-  <<find-data>>
-
   <<ploc-search>>
 #+end_src
 It can  be transformed without  adversarial advantage into a  procedure ignoring
-the fetched tree:
-#+begin_src sh :exports results :results output
+the fetched  tree and in which  the calls to ~get-target~  and ~get-all-targets~
+have been inlined:
+#+begin_src sh :exports results :results output :wrap src diff
   diff -u tmp/ploc-search-0.scm tmp/ploc-search-1.scm | grep -v "search-"
 #+end_src
 #+RESULTS:
-#+begin_example
-@@ -5,21 +5,7 @@
-   (map (λ (v) (get-target key label v))
-        (iota V)))
-
--(define (find-data subtree target)
--  (define (matching-datum? datum)
--    (= (datum->target datum) target))
--  (filter matching-datum? (branch-data subtree target)))
--
- (define (ploc-search key label)
--  (let* ((targets  (get-all-targets key label))
--         (subtree  (tree-fetch key targets)))
--    (reverse
--     (foldl (λ (result target)
--              (match (find-data subtree target)
--                (()      result)
--                ((datum) (cons (datum->value datum) result))
--                ( data   (error ploc-search
--                                "more than one datum found"
--                                data))))
--            (list)
--            targets))))
-+  (let* ((targets (get-all-targets key label))
-+         (subtree (tree-fetch key targets)))
-+    (values)))
-#+end_example
-which gives:
-#+begin_src scheme :tangle tmp/ploc-search-1.scm
-  (define (get-target key label volume)
-    (H key label volume))
-
-  (define (get-all-targets key label)
-    (map (λ (v) (get-target key label v))
-         (iota V)))
-
-  (define (ploc-search key label)
-    (let* ((targets (get-all-targets key label))
-           (subtree (tree-fetch key targets)))
-      (values)))
-#+end_src
-In the oracle model, we can replace the keyed hash function with a negligible
-adversarial advantage by a call to a PRF and inline this call.
-#+begin_src sh :exports results :results output
-  diff -bu tmp/ploc-search-1.scm tmp/ploc-search-2.scm | grep -v "search-"
-#+end_src
-#+RESULTS:
-#+begin_example
-@@ -1,11 +1,4 @@
+#+begin_src diff
+@@ -1,21 +1,4 @@
 -(define (get-target key label volume)
 -  (H key label volume))
 -
@@ -1009,61 +830,90 @@ adversarial advantage by a call to a PRF and inline this call.
 -
  (define (ploc-search key label)
 -  (let* ((targets (get-all-targets key label))
-+  (let* ((targets (map (λ (v) (PRF label v)) (iota V)))
-          (subtree (tree-fetch key targets)))
-     (values)))
-#+end_example
+-         (subtree (tree-select key targets))
+-         (values  (tree-data subtree)))
+-    (reverse
+-     (foldl (λ (acc target)
+-              (match (multi-map-get values target)
+-                (()      acc)
+-                ((value) (cons value acc))
+-                ( values (error ploc-search
+-                                "more than one values found"
+-                                target values))))
+-            (list)
+-            targets))))
++  (let* ((targets (map (λ (v) (H key label v)) (iota V)))
++         (subtree (tree-select key targets)))
++    (values)))
+#+end_src
 which gives:
-#+begin_src scheme :tangle tmp/ploc-search-2.scm
+#+begin_src scheme :tangle tmp/ploc-search-1.scm
   (define (ploc-search key label)
-    (let* ((targets (map (λ (v) (PRF label v)) (iota V)))
-           (subtree (tree-fetch key targets)))
+    (let* ((targets (map (λ (v) (H key label v)) (iota V)))
+           (subtree (tree-select key targets)))
       (values)))
+#+end_src
+In the oracle  model, we can replace  the keyed hash function  with a negligible
+adversarial advantage by a call to a PRF:
+#+begin_src sh :exports results :results output :wrap src diff
+  diff -bu tmp/ploc-search-1.scm tmp/ploc-search-2.scm | grep -v "search-"
+#+end_src
+#+RESULTS:
+#+begin_src diff
+@@ -1,4 +1,4 @@
+ (define (ploc-search key label)
+-  (let* ((targets (map (λ (v) (H key label v)) (iota V)))
++  (let* ((targets (map (λ (v) (PRF label v)) (iota V)))
+          (subtree (tree-select key targets)))
+     (values)))
 #+end_src
 Then,  by security  of the  PRF,  the label  can  be replaced  by any  bijection
 $f:\mathbb{L}\rightarrow [1,|\bbL|]$,  transforming the  given ~label~  into its
 index ~label-idx~:
-#+begin_src sh :exports results :results output
+#+begin_src sh :exports results :results output :wrap src diff
   diff -u tmp/ploc-search-2.scm tmp/ploc-search-3.scm | grep -v "search-"
 #+end_src
 #+RESULTS:
-: @@ -1,4 +1,4 @@
-: -(define (ploc-search key label)
-: -  (let* ((targets (map (λ (v) (PRF label v)) (iota V)))
-: +(define (ploc-search key label-idx)
-: +  (let* ((targets (map (λ (v) (PRF label-idx v)) (iota V)))
-:           (subtree (tree-fetch key targets)))
-:      (values)))
-#+latex: \noindent
+#+begin_src diff
+@@ -1,4 +1,4 @@
+-(define (ploc-search key label)
+-  (let* ((targets (map (λ (v) (PRF label v)) (iota V)))
++(define (ploc-search key label-idx)
++  (let* ((targets (map (λ (v) (PRF label-idx v)) (iota V)))
+          (subtree (tree-select key targets)))
+     (values)))
+#+end_src
 which gives:
 #+begin_src scheme :tangle tmp/ploc-search-3.scm
   (define (ploc-search key label-idx)
     (let* ((targets (map (λ (v) (PRF label-idx v)) (iota V)))
-           (subtree (tree-fetch key targets)))
+           (subtree (tree-select key targets)))
       (values)))
 #+end_src
-By  security of  the tree  encryption scheme,  the call  to ~tree-fetch~  can be
-replaced   by   a   call    to   $\phi_{pp_\tau}   \circ   \cL_{\tau}$.    Since
-$\cL_{\tau}(\Fetch,    \mathrm{targets})    =    (\Fetch,    \mathrm{targets})$,
-~(tree-fetch key targets)~ is indistinguishable from ~(phi 'fetch targets)~:
-#+begin_src sh :exports results :results output
+Finally,  by  security  of  the  binary-tree  encryption  scheme,  the  call  to
+~tree-select~ can  be replaced by  a call to $\phi_{pp_\tau}  \circ \cL_{\tau}$.
+Since  $\cL_{\tau}(\Fetch,  \mathrm{targets})   =  (\Fetch,  \mathrm{targets})$,
+~(tree-select key targets)~ is indistinguishable from ~(phi 'select targets)~:
+#+begin_src sh :exports results :results output :wrap src diff
   diff -u tmp/ploc-search-3.scm tmp/ploc-search-4.scm | grep -v "search-"
 #+end_src
 #+RESULTS:
-: @@ -1,4 +1,4 @@
-: -(define (ploc-search key label-idx)
-: +(define (psi-search label-idx)
-:    (let* ((targets (map (λ (v) (PRF label-idx v)) (iota V)))
-: -         (subtree (tree-fetch key targets)))
-: +         (subtree (phi 'fetch targets)))
-:      (values)))
+#+begin_src diff
+@@ -1,4 +1,4 @@
+-(define (ploc-search key label-idx)
++(define (psi-search label-idx)
+   (let* ((targets (map (λ (v) (PRF label-idx v)) (iota V)))
+-         (subtree (tree-select key targets)))
++         (subtree (phi 'select targets)))
+     (values)))
+#+end_src
 #+latex: \noindent
 which gives:
 #+name: psi-search
 #+begin_src scheme :tangle tmp/ploc-search-4.scm
   (define (psi-search label-idx)
     (let* ((targets (map (λ (v) (PRF label-idx v)) (iota V)))
-           (subtree (phi 'fetch targets)))
+           (subtree (phi 'select targets)))
       (values)))
 #+end_src
 Therefore, the only non-trivial leakage of  a $\ploc$ search is some indexing on
@@ -1081,24 +931,27 @@ Recall the insertion works as follows:
   <<ploc-insert>>
 #+end_src
 and suppose for now that compaction never overflows. The insertion can therefore
-be reduced without adversarial advantage to a procedure that ignores compaction
-error:
-#+begin_src sh :exports results :results output
-  diff -u tmp/ploc-insert-0.scm tmp/ploc-insert-1.scm | grep -v "ploc-insert-"
+be reduced without adversarial advantage  to a procedure that ignores compaction
+error and does not modify the volumes:
+#+begin_src sh :exports results :results output :wrap src diff
+   diff -u tmp/ploc-insert-0.scm tmp/ploc-insert-1.scm | grep -v "ploc-insert-"
 #+end_src
 #+RESULTS:
-#+begin_example
-@@ -9,8 +9,6 @@
- (define (ploc-insert key label value)
-   (let ((data    (list (make-datum key label value)))
-         (subtree (tree-fetch key (scheduler))))
--    (let-values (((subtree data) (compact subtree 0 data)))
--      (unless (null? data)
--        (error "tree overflow" subtree label value))
-+    (let ((subtree (compact subtree 0 data)))
-       (increment-volume label)
-       (tree-merge key subtree))))
-#+end_example
+#+begin_src diff
+@@ -10,10 +10,6 @@
+   (let ((data (list (make-datum key label value)))
+         (tx   (λ (tree)
+                 (call-with-values (λ () (compact tree 0 data))
+-                  (λ (tree overflow)
+-                    (if (null? overflow)
+-                        tree
+-                        (error ploc-insert "compaction overflow"
+-                               label value tree overflow)))))))
++                  (λ (tree _) tree)))))
+     (tree-mutate key (scheduler) tx)
+-    (increment-volume label)))
++    (values)))
+#+end_src
 #+begin_src scheme :tangle tmp/ploc-insert-1.scm :exports none
   (define (get-target key label volume)
     (H key label volume))
@@ -1106,39 +959,32 @@ error:
   (define (make-datum key label value)
     (let* ((volume (get-volume label))
            (target (get-target key label volume)))
-      (new-datum target value)))
+      (datum value target)))
 
   (define (ploc-insert key label value)
-    (let ((data    (list (make-datum key label value)))
-          (subtree (tree-fetch key (scheduler))))
-      (let ((subtree (compact subtree 0 data)))
-        (increment-volume label)
-        (tree-merge key subtree))))
+    (let ((data (list (make-datum key label value)))
+          (tx   (λ (tree)
+                  (call-with-values (λ () (compact tree 0 data))
+                    (λ (tree _) tree)))))
+      (tree-mutate key (scheduler) tx)
+      (values)))
 #+end_src
-By  security  of the  tree  encryption  scheme,  the  call to  ~(tree-fetch  key
-targets)~ can  be replaced with  only negligible adversarial advantage  by ~(phi
-'fetch targets)~,  and the call to  ~(tree-merge key subtree)~ can  similarly be
-replaced by a call to ~(phi 'merge targets)~.
-#+begin_src sh :exports results :results output
+By  security of  the  tree  encryption scheme,  the  call  to ~(tree-mutate  key
+(scheduler) tx)~ can  be replaced with only negligible  adversarial advantage by
+~(phi 'mutate (scheduler)~.
+#+begin_src sh :exports results :results output :wrap src diff
   diff -u tmp/ploc-insert-1.scm tmp/ploc-insert-2.scm | grep -v "ploc-insert-"
 #+end_src
 #+RESULTS:
-#+begin_example
-@@ -7,8 +7,9 @@
-     (new-datum target value)))
-
- (define (ploc-insert key label value)
--  (let ((data    (list (make-datum key label value)))
--        (subtree (tree-fetch key (scheduler))))
--    (let ((subtree (compact subtree 0 data)))
-+  (let* ((data    (list (make-datum key label value)))
-+         (targets (scheduler))
-+         (subtree (phi 'fetch targets)))
-+    (let ((subtree (compact subtree 0 (list datum))))
-       (increment-volume label)
--      (tree-merge key subtree))))
-+      (phi 'merge targets))))
-#+end_example
+#+begin_src diff
+@@ -11,5 +11,5 @@
+         (tx   (λ (tree)
+                 (call-with-values (λ () (compact tree 0 data))
+                   (λ (tree _) tree)))))
+-    (tree-mutate key (scheduler) tx)
++    (phi 'mutate (scheduler))
+     (values)))
+#+end_src
 which gives:
 #+begin_src scheme :tangle tmp/ploc-insert-2.scm
   (define (get-target key label volume)
@@ -1147,51 +993,49 @@ which gives:
   (define (make-datum key label value)
     (let* ((volume (get-volume label))
            (target (get-target key label volume)))
-      (new-datum target value)))
+      (datum value target)))
 
   (define (ploc-insert key label value)
-    (let* ((data    (list (make-datum key label value)))
-           (targets (scheduler))
-           (subtree (phi 'fetch targets)))
-      (let ((subtree (compact subtree 0 (list datum))))
-        (increment-volume label)
-        (phi 'merge targets))))
+    (let ((data (list (make-datum key label value)))
+          (tx   (λ (tree)
+                  (call-with-values (λ () (compact tree 0 data))
+                    (λ (tree _) tree)))))
+      (phi 'mutate (scheduler))
+      (values)))
 #+end_src
 Finally, removing unused variables can be performed without adversarial
 advantage:
-#+begin_src sh :exports results :results output
+#+begin_src sh :exports results :results output :wrap src diff
   diff -u tmp/ploc-insert-2.scm tmp/ploc-insert-3.scm | grep -v "ploc-insert-"
 #+end_src
 #+RESULTS:
-#+begin_example
-@@ -1,15 +1,4 @@
+#+begin_src diff
+@@ -1,15 +1,3 @@
 -(define (get-target key label volume)
 -  (H key label volume))
 -
 -(define (make-datum key label value)
 -  (let* ((volume (get-volume label))
 -         (target (get-target key label volume)))
--    (new-datum target value)))
+-    (datum value target)))
 -
 -(define (ploc-insert key label value)
--  (let* ((data    (list (make-datum key label value)))
--         (targets (scheduler))
--         (subtree (phi 'fetch targets)))
--    (let ((subtree (compact subtree 0 (list datum))))
--      (increment-volume label)
--      (phi 'merge targets))))
+-  (let ((data (list (make-datum key label value)))
+-        (tx   (λ (tree)
+-                (call-with-values (λ () (compact tree 0 data))
+-                  (λ (tree _) tree)))))
+-    (phi 'mutate (scheduler))
+-    (values)))
 +(define (psi-insert)
-+  (let ((targets (scheduler)))
-+    (phi 'fetch targets)
-+    (phi 'merge targets)))
-#+end_example
++  (phi 'mutate (scheduler))
++  (values))
+#+end_src
 which gives:
 #+name: psi-insert
 #+begin_src scheme :tangle tmp/ploc-insert-3.scm
   (define (psi-insert)
-    (let ((targets (scheduler)))
-      (phi 'fetch targets)
-      (phi 'merge targets)))
+    (phi 'mutate (scheduler))
+    (values))
 #+end_src
 Therefore a $\ploc$  insertion only has trivial leakages if  compaction does not
 overflow.  The following  section  gives  constraints on  $c$  to guarantee  the
@@ -1239,9 +1083,9 @@ probability of the upper tail of that distribution:
              & \le & \left(\frac{eBp}{k} \right)^k \\
 \end{array}\]
 #+end_export
-In what follows, we will be are interested in finding the smallest integer value
-of $k$ such  that $m \times P(X  \ge k) \le 2^{-\lambda}$  for some multiplicity
-$m$ which value will depend on the proof. We therefore pose:
+In what follows, we will be interested  in finding the smallest integer value of
+$k$ such that $m  \times P(X \ge k) \le 2^{-\lambda}$  for some multiplicity $m$
+which value will depend on the proof. We therefore pose:
 #+begin_export latex
 \[\begin{equation}
   x(B,p,\lambda) \left(\ln(x(B,p,\lambda)) - \ln(Bp) - 1 \right) = \lambda \ln(2) + \ln(m)
@@ -1423,7 +1267,7 @@ probability negligible in $\lambda$.
     by an overflow of its parent. On the  other hand, if the set of old bindings
     is  empty,  the  node  capacity $c(N,\lambda)$  guarantees  the  absence  of
     overflow with overwhelming probability.
-Therefore,  a tree  overflow  can only  happen  if the  root is  the  tip of  an
+Therefore,  a tree  overflow can  only happens  if  the root  is the  tip of  an
 overflowing path  to some leaf.  In  particular, if the leaves  cannot overflow,
 the tree cannot overflow.  We could  choose the leaf capacity to be $k^{\lambda,
 N}_{N, N^{-1}}$ to guarantee $\bD$.  It would however unnecessarily increase the
@@ -1544,28 +1388,28 @@ for which both $\bS$ and $\bD$ hold for some values of $\lambda$, $n$ and $N$:
 #+end_src
 
 #+name: table:numerical-analysis-lambda=128
-#+caption: $c^*(\lambda, n, N)$ in function of $n$ and $\lg(N)$ for $\lambda = 128$.
-|   / |  < |          |    |
-| $n$ |    | $\lg(N)$ |    |
-|     | 16 |       32 | 40 |
-|-----+----+----------+----|
-|  16 | 19 |       19 | 19 |
-|  32 | 17 |       17 | 17 |
-|  64 | 16 |       16 | 16 |
-| 128 | 14 |       14 | 14 |
-| 256 | 13 |       13 | 13 |
+#+caption: $c^*(\lambda, n, N)$ in function of $n$ and $D$ for $\lambda = 128$.
+|   / |  < |     |    |
+| $n$ |    | $D$ |    |
+|     | 16 |  32 | 40 |
+|-----+----+-----+----|
+|  16 | 19 |  19 | 19 |
+|  32 | 17 |  17 | 17 |
+|  64 | 16 |  16 | 16 |
+| 128 | 14 |  14 | 14 |
+| 256 | 13 |  13 | 13 |
 
 #+name: table:numerical-analysis-lambda=64
-#+caption: $c^*(\lambda, n, N)$ in function of $n$ and $\lg(N)$ for $\lambda = 64$.
-|   / |  < |          |    |
-| $n$ |    | $\lg(N)$ |    |
-|     | 16 |       32 | 40 |
-|-----+----+----------+----|
-|  16 | 11 |       11 | 11 |
-|  32 | 10 |       10 | 10 |
-|  64 |  9 |        9 |  9 |
-| 128 |  8 |        8 |  8 |
-| 256 |  7 |        8 |  8 |
+#+caption: $c^*(\lambda, n, N)$ in function of $n$ and $D$ for $\lambda = 64$.
+|   / |  < |     |    |
+| $n$ |    | $D$ |    |
+|     | 16 |  32 | 40 |
+|-----+----+-----+----|
+|  16 | 11 |  11 | 11 |
+|  32 | 10 |  10 | 10 |
+|  64 |  9 |   9 |  9 |
+| 128 |  8 |   8 |  8 |
+| 256 |  7 |   8 |  8 |
 
 ** $\ploc$ simulator
 
@@ -1603,7 +1447,7 @@ label upon search, this proves that $\ploc$ is injection-secure.
 
 #+name: theorem:performance
 #+begin_theorem
-When  instantiated using  a  \((c  \lg \bbV,  B)\)-tree  encryption scheme  with
+When  instantiated using  an \((c  \lg  \bbV, B)\)-tree  encryption scheme  with
 $O(|\{b_i\}| \times c \lg \bbV \lg B)$ $\Fetch$ and $\Merge$ operations, $\ploc$
 is  an   \((\bbL,\bbV)\)-multi-map  encryption   scheme  with   two-round  $O((c
 \lg  |\bbV|  +  C_1)  n  \lg   B)$  $\Insert$  operations  and  one-round  $O((c
@@ -1612,7 +1456,7 @@ is  an   \((\bbL,\bbV)\)-multi-map  encryption   scheme  with   two-round  $O((c
 
 #+begin_proof
 The  number  of  rounds  can  be  enumerated from  the  code  of  the  reference
-implementation described in  section [[*Description]].  In the case  of an $\Insert$
+implementation  described in  section [[*$\ploc$]].   In  the case  of an  $\Insert$
 operation, a  subtree of $n$  leaves is successively fetched,  modified locally,
 then  merged  back to  the  main  tree.  Since  the  tree  encryption scheme  is
 instantiated with  $s = c \lg  |\bbV|$ and $D =  \lg B$, the complexity  of both
@@ -1645,9 +1489,9 @@ to $B$ in the present benchmark.
 
 ** Fully-dynamic multi-map encryption scheme
 
-The  scheme  described  in  section [[*Description]]  only  supports  $\Insert$  and
-$\Search$ queries. However, the possibility to delete bindings is usually needed
-by concrete  use-cases.  It  is actually possible  to implement  a fully-dynamic
+The scheme described  in section [[*$\ploc$]] only supports  $\Insert$ and $\Search$
+queries.  However, the  possibility  to  delete bindings  is  usually needed  by
+concrete  use-cases.   It is  actually  possible  to implement  a  fully-dynamic
 multi-map  encryption scheme  on  top  of $\ploc$  with  the  same security  and
 performance characteristics using a classic  technique known as /lazy deletions/
 that  we  find more  appropriate  to  call  /journaling/: instead  of  inserting
@@ -1939,8 +1783,8 @@ returns both ~lhs~ and ~rhs~.
     (let loop ((xs xs) (lhs (list)) (rhs (list)))
       (match xs
         ((x . xs) (if (pred? x)
-                      (loop xs (cons x lhs) rhs)
-                      (loop xs lhs (cons x rhs))))
+                      (loop xs (pair x lhs) rhs)
+                      (loop xs lhs (pair x rhs))))
         (()       (values lhs rhs)))))
   #+end_src
 
@@ -1955,6 +1799,138 @@ The $\ploc$ implementation also makes use of the classical procedures:
 - ~(filter pred? xs)~ which returns the list of all values in ~xs~ matching the
   predicate function ~pred?~.
 
+* Tree Encryption Scheme
+
+$\ploc$  relies  on an  \((s,  D)\)-binary-tree  encryption scheme,  defined  in
+section [[*$\ploc$]]. The present section describes an implementation of this scheme
+for completeness only.
+
+** Tree serialization
+
+Following the design choices discussed  in [cite:@EPRINT:BreHeb24], we rely on a
+server abstraction  exposing a  linear 128-bit memory  space with  the following
+operations:
+- ~(memory-setup)~ initializes a new server-side abstraction of a 128-bit linear
+  memory space;
+- ~(memory-read addresses)~  atomically reads  from given addresses  and returns
+  the list  of words bound  to these addresses, or  the special value  ~free~ in
+  case no word was found;
+- ~(memory-write bindings)~ atomically writes the given bindings to memory.
+In order to fit  a tree into a linear memory, we need  to associate each node to
+an address that is  computed from its /node ID/ -- defined  as the shared prefix
+of each branch leading to this node -- and depth as follows:
+#+name: make-address
+#+begin_src scheme
+  (define (make-address depth target)
+    (G depth (node-id depth target)))
+#+end_src
+where  ~G~ is  a hash  function which  is only  required to  have a  good-enough
+collision resistance.
+
+** Setup
+
+The ~tree-setup~  simply consists  in setting-up a  new server-side  memory, and
+returning a fresh AE key.
+#+name: tree-setup
+#+begin_src scheme
+  (define (tree-setup)
+    (memory-setup)
+    (AE-keygen))
+#+end_src
+Not initializing the  tree avoids a $O(N)$ setup without  leaking any additional
+information in the  persistent-adversary model. Note that  we could pre-allocate
+enough server-side memory up-front since the size of the tree is already known.
+
+** Select
+
+To return the subtree  generated by the given target branches,  we first need to
+derive  all  the addresses  of  its  nodes, which  can  be  performed using  the
+following ~subtree-addresses~ procedure:
+#+name: subtree-addresses
+#+begin_src scheme
+  (define (subtree-addresses branches)
+    (let loop ((depth 0) (branches branches) (addresses (list)))
+      (if (or (null? branches) (< max-depth depth))
+          addresses
+          (let-values (((lhs rhs)
+                        (split-with (λ (b) (go-left? depth b))
+                                    branches)))
+            (loop (+ depth 1) rhs
+                  (loop (+ depth 1) lhs
+                        (pair (make-address depth (car branches))
+                              addresses)))))))
+#+end_src
+Reading data from  a word is performed by decrypting  this word and interpreting
+the resulting  bytes as a  serialized data.  Since  the tree was  no initialized
+in-memory upon  setup, some addresses  might be free,  which must be  taken into
+account:
+#+name: word->data
+#+begin_src scheme
+  (define (word->data AE word)
+    (if (null? word)
+        (list)
+        (bytes->data (AE-decrypt AE word))))
+#+end_src
+Finally, the tree can  be built from the words read by relying  on the fact that
+~memory-read~ preserves  the address order:  we can perform the  exact /reverse/
+tree traversal as  in ~subtree-addresses~ (in which the right  recursive call is
+performed first while it was performed last in ~subtree-address~) since the list
+in which the addresses were accumulated is a stack.
+#+name: words->tree
+#+begin_src scheme
+  (define (words->tree AE branches words)
+    (let loop ((depth 0) (branches branches) (words words))
+      (if (or (null? branches) (< max-depth depth))
+          (values (sentinel) words)
+          (let*-values
+              (((lhs rhs) (split-with (λ (b) (go-left? depth b))
+                                      branches))
+               ((r-child words) (loop (+ depth 1) rhs words))
+               ((l-child words) (loop (+ depth 1) lhs words)))
+            (values (new-node (word->data AE (car words))
+                              l-child r-child)
+                    (cdr words))))))
+#+end_src
+We can now write the complete  ~tree-select~ procedure:
+#+name: tree-select
+#+begin_src scheme
+  (define (tree-select key branches)
+    (let* ((addresses (subtree-addresses branches))
+           (words     (memory-read addresses)))
+      (words->tree (AE-init key) branches words)))
+#+end_src
+
+** Mutate
+
+Mutating the tree consists in fetching the subtree defined by the given branches
+much like  the ~select~ procedure,  generating the  new subtree using  the given
+transformation and  writing it  back to  memory.  To  do that,  we first  need a
+procedure to convert a tree into bindings:
+#+name: tree->bindings
+#+begin_src scheme
+  (define (tree->bindings AE root)
+    (let loop ((depth 0) (branch 0) (node root) (bindings (list)))
+      (match node
+        (#(data l-child r-child)
+         (let ((address (make-address depth branch))
+               (word    (AE-encrypt AE (data->bytes data))))
+           (loop (+ depth 1) (go-right depth branch) r-child
+                 (loop (+ depth 1) (go-left depth branch) l-child
+                       (pair (pair address word) bindings)))))
+        (() bindings))))
+#+end_src
+#+name: tree-mutate
+#+begin_src scheme
+  (define (tree-mutate key branches transformation)
+    (let* ((addresses (subtree-addresses branches))
+           (words     (memory-read addresses))
+           (AE        (AE-init key))
+           (old-tree  (words->tree AE branches words))
+           (new-tree  (transformation old-tree)))
+      (assert (equal-tree-structure? old-tree new-tree))
+      (memory-write (tree->bindings AE new-tree))))
+#+end_src
+
 * Reference implementation
 ** Useful functions
 
@@ -1963,8 +1939,9 @@ We first define some additional wrappers, utility functions and data-structures.
 #+begin_src scheme :tangle sse/utils.scm :noweb yes
   (library (sse utils)
     (export λ lg << >> && u8? u64? iota foldl split-with take match
-            make-hmap hmap-find hmap-bind!
-            make-hset hset-has? hset-add!  hset->list)
+            pair hash-map hash-map-find hash-map-bind!
+            new-node sentinel node-id go-left go-right go-left? tree-dfs
+            equal-tree-structure?)
     (import (rnrs base)
             (rnrs control)
             (rnrs lists)
@@ -1991,33 +1968,45 @@ We first define some additional wrappers, utility functions and data-structures.
     (define (>> n e) (bitwise-arithmetic-shift-right n e))
     (define (&& n m) (bitwise-and n m))
 
+    (define pair cons)
     (define head car)
     (define tail cdr)
-
     (define foldl fold-left)
 
     (define (take n lst)
       (let loop ((n n) (pfx (list)) (lst lst))
         (if (or (zero? n) (null? lst))
             (values pfx lst)
-            (loop (- n 1) (cons (head lst) pfx) (tail lst)))))
+            (loop (- n 1) (pair (head lst) pfx) (tail lst)))))
 
     (define (split-with pred? xs)
       (let loop ((xs xs) (lhs (list)) (rhs (list)))
         (if (pair? xs)
             (if (pred? (head xs))
-                (loop (tail xs) (cons (head xs) lhs) rhs)
-                (loop (tail xs) lhs (cons (head xs) rhs)))
+                (loop (tail xs) (pair (head xs) lhs) rhs)
+                (loop (tail xs) lhs (pair (head xs) rhs)))
             (values lhs rhs))))
 
-    (define (make-hmap)           (make-hashtable equal-hash equal?))
-    (define (hmap-find  hmap k d) (hashtable-ref hmap k d))
-    (define (hmap-bind! hmap k v) (begin (hashtable-set! hmap k v) hmap))
+    (define (hash-map)                (make-hashtable equal-hash equal?))
+    (define (hash-map-find  hmap k d) (hashtable-ref hmap k d))
+    (define (hash-map-bind! hmap k v) (begin (hashtable-set! hmap k v) hmap))
 
-    (define (make-hset)        (make-hashtable equal-hash equal?))
-    (define (hset-has? hset v) (hashtable-ref hset v #f))
-    (define (hset-add! hset v) (begin (hashtable-set! hset v #t) hset))
-    (define (hset->list hset)  (vector->list (hashtable-keys hset))))
+    <<node-constructors>>
+
+    <<tree-dfs>>
+
+    <<branch-utils>>
+
+    (define (equal-tree-structure? root1 root2)
+      (define (l-child node) (vector-ref node 1))
+      (define (r-child node) (vector-ref node 2))
+      (let loop ((lhs root1) (rhs root2))
+        (cond ((and (vector? lhs) (vector? rhs))
+               (and
+                (equal-tree-structure? (l-child lhs) (l-child rhs))
+                (equal-tree-structure? (r-child lhs) (r-child rhs))))
+              ((and (null? lhs) (null? rhs)) #t)
+              (else #f)))))
 #+end_src
 
 ** Serialization
@@ -2204,7 +2193,7 @@ We give here the complete code that allows to run a $\ploc$ client.
       (define (read-datum bytes pos)
         (let*-values (((target pos) (read-u128  bytes pos))
                       ((value  pos) (read-value bytes pos)))
-          (values (new-datum target value)
+          (values (datum value target)
                   pos)))
 
       (define (data->bytes data)
@@ -2223,12 +2212,13 @@ We give here the complete code that allows to run a $\ploc$ client.
             (if (= i len)
                 data
                 (let-values (((datum pos) (read-datum bytes pos)))
-                  (loop (+ i 1) pos (cons datum data)))))))
+                  (loop (+ i 1) pos (pair datum data)))))))
 
-      (define-values (tree-setup tree-fetch tree-merge)
-        (make-tree B G data->bytes bytes->data
-                   AE-init AE-keygen AE-encrypt AE-decrypt
-                   memory-setup memory-read memory-write))
+      (define-values (tree-setup tree-select tree-mutate)
+        (let ((D (inexact->exact (ceiling (lg B)))))
+          (make-tree D G data->bytes bytes->data
+                     AE-init AE-keygen AE-encrypt AE-decrypt
+                     memory-setup memory-read memory-write)))
 
       <<scheduler>>
 
@@ -2240,7 +2230,7 @@ We give here the complete code that allows to run a $\ploc$ client.
 
       <<get-all-targets>>
 
-      <<find-data>>
+      <<tree-data>>
 
       <<compact>>
 
@@ -2257,52 +2247,36 @@ We give here the complete code that allows to run a $\ploc$ client.
 
 #+begin_src scheme :tangle sse/tree.scm :noweb yes
   (library (sse tree)
-    (export make-node go-left? branch-data make-tree)
+    (export make-tree)
     (import (rnrs base) (sse utils) (sse serialization))
 
-    <<make-node>>
-
-    <<go-left?>>
-
-    <<node-id-helpers>>
-
-    (define (branch-data tree target)
-      (let loop ((node tree) (node-id 0) (depth 0))
-        (match node
-          (#(bytes l-child r-child)
-           (append bytes
-                   (if (go-left? depth target)
-                       (loop l-child (l-child-id node-id) (+ depth 1))
-                       (loop r-child (r-child-id node-id) (+ depth 1)))))
-          ('() (list)))))
-
-
-    (define (make-tree N G data->bytes bytes->data
+    (define (make-tree D G data->bytes bytes->data
                        AE-init AE-keygen AE-encrypt AE-decrypt
                        memory-setup memory-read memory-write)
 
-      (define max-depth (lg N))
+      (define max-depth D)
 
       <<make-address>>
 
       <<subtree-addresses>>
 
-      <<branch-addresses>>
+      <<word->data>>
 
-      <<bindings->tree>>
+      <<words->tree>>
 
       <<tree->bindings>>
 
       <<tree-setup>>
 
-      <<tree-fetch>>
+      <<tree-select>>
 
-      <<tree-merge>>
+      <<tree-mutate>>
 
-      (values tree-setup tree-fetch tree-merge)))
+      (values tree-setup tree-select tree-mutate)))
 #+end_src
 
 * COMMENT tests
+
 #+begin_src scheme :tangle tests/bounds.scm :noweb yes
   (library (tests bounds)
     (export get-min-c*)

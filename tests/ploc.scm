@@ -11,7 +11,6 @@
   #:use-module (rnrs bytevectors)
   #:export (make-test-ploc test-ploc))
 
-
 (define (make-test-ploc n B V c)
   (define (H key label i)
     "Returns a 128-bit cryptograohic hash of the given label and index."
@@ -23,10 +22,9 @@
              (pos (write-u64!   bytes pos i)))
         (read-u128 (sha3 bytes) 0))))
 
-  (define (G node-id depth)
-    "Returns a 128-bit non-cryptographic hash of the given node ID and depth."
-    (+ (<< (equal-hash node-id) 8)
-       (equal-hash depth)))
+  (define (G depth target)
+    "Returns a 128-bit non-cryptographic hash of the given depth and branch."
+    (+ (<< depth 64) target))
 
   (define-values (setup read write . _) (in-memory))
 
@@ -47,7 +45,7 @@
     (values setup search insert)))
 
 
-(define (make-sse-test sse-setup sse-search sse-insert)
+(define (make-sse-test V sse-setup sse-search sse-insert)
   (define bindings-list
     (map (λ (i)
            (map (λ (j)
@@ -55,7 +53,7 @@
                         (v j))
                     (cons k v)))
                 (iota (1+ i))))
-         (iota 10)))
+         (iota V)))
 
   (define searched-keywords
     (map (λ (bindings) (caar bindings))
@@ -86,6 +84,6 @@
   (define test
     (call-with-values (λ () (make-test-ploc n B V c))
       (λ (ploc-setup ploc-search ploc-insert)
-        (make-sse-test ploc-setup ploc-search ploc-insert))))
+        (make-sse-test V ploc-setup ploc-search ploc-insert))))
 
   (test))
